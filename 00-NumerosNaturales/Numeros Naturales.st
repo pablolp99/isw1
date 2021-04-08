@@ -27,34 +27,47 @@ next
 
 	^unSumando next! !
 
-!I class methodsFor: 'operations' stamp: 'jn 4/8/2021 13:55:15'!
-/ unDividendo
-	self < unDividendo ifTrue: [^self descripcionDeErrorDeNoSePuedeDividirConResto] ifFalse: [^self].! !
+!I class methodsFor: 'operations' stamp: 'jn 4/8/2021 15:16:48'!
+- unMinuendo
 
-!I class methodsFor: 'operations' stamp: 'jn 4/8/2021 13:27:33'!
+	^self error: self descripcionDeErrorDeNumerosNegativosNoSoportados.
+! !
+
+!I class methodsFor: 'operations' stamp: 'jn 4/8/2021 15:16:51'!
+/ unDividendo
+
+	self < unDividendo ifTrue: [^self error: self descripcionDeErrorDeNoSePuedeDividirPorUnNumeroMayor] ifFalse: [^self].! !
+
+!I class methodsFor: 'operations' stamp: 'jn 4/8/2021 15:16:55'!
 < unNumero
+
 	^self name < unNumero name! !
 
-!I class methodsFor: 'operations' stamp: 'jn 4/8/2021 13:27:06'!
-= unNumero
-	^self name = unNumero name! !
+!I class methodsFor: 'operations' stamp: 'jn 4/8/2021 15:16:58'!
+div: unDividendo
 
-!I class methodsFor: 'operations' stamp: 'jn 4/5/2021 21:59:35'!
+	self < unDividendo ifTrue: [^self error: self descripcionDeErrorDeLaDivisionNoEsNatural] ifFalse: [^self].! !
+
+!I class methodsFor: 'operations' stamp: 'jn 4/8/2021 15:17:02'!
 substractFrom: minuendo 
+
 	^minuendo previous! !
 
 
-!I class methodsFor: 'errors' stamp: 'jn 4/8/2021 13:54:37'!
-descripcionDeErrorDeNoSePuedeDividirConResto
-	^self error: 'La division no es entera'! !
+!I class methodsFor: 'errors' stamp: 'jn 4/8/2021 15:16:29'!
+descripcionDeErrorDeLaDivisionNoEsNatural
 
-!I class methodsFor: 'errors' stamp: 'jn 4/8/2021 13:54:11'!
+	^'La division no es natural.'! !
+
+!I class methodsFor: 'errors' stamp: 'jn 4/8/2021 15:21:51'!
 descripcionDeErrorDeNoSePuedeDividirPorUnNumeroMayor
-	^self error: 'No se puede dividir por un numero mayor'! !
 
-!I class methodsFor: 'errors' stamp: 'jn 4/8/2021 13:55:55'!
+	^'No se puede dividir por un numero mayor.'! !
+
+!I class methodsFor: 'errors' stamp: 'jn 4/8/2021 15:16:37'!
 descripcionDeErrorDeNumerosNegativosNoSoportados
-	^self error: 'Numeros negativos no son naturales'! !
+
+	^'Numeros negativos no son naturales'! !
 
 
 !classDefinition: #II category: 'Numeros Naturales'!
@@ -80,45 +93,55 @@ II class
 
 	^self previous + unSumando next! !
 
-!II class methodsFor: 'operations' stamp: 'jn 4/5/2021 21:57:34'!
+!II class methodsFor: 'operations' stamp: 'jn 4/8/2021 15:17:33'!
 - sustraendo
+
 	^sustraendo substractFrom: self  
 ! !
 
-!II class methodsFor: 'operations' stamp: 'jn 4/8/2021 13:55:00'!
+!II class methodsFor: 'operations' stamp: 'jn 4/8/2021 15:23:46'!
 / unDividendo
-	self < unDividendo ifTrue: [^self descripcionDeErrorDeNoSePuedeDividirConResto ] ifFalse: [
-		self = unDividendo ifTrue: [^I] ifFalse:[
-			^(self - unDividendo / unDividendo) + I
-			]
-		].
+
+	^self < unDividendo ifTrue: [self error: self descripcionDeErrorDeNoSePuedeDividirPorUnNumeroMayor] ifFalse: [
+		self div: unDividendo
+	].
 	
 	! !
 
-!II class methodsFor: 'operations' stamp: 'jn 4/8/2021 13:27:42'!
+!II class methodsFor: 'operations' stamp: 'jn 4/8/2021 15:17:38'!
 < unNumero
+
 	^self name < unNumero name! !
 
-!II class methodsFor: 'operations' stamp: 'jn 4/8/2021 13:26:55'!
-= unNumero
-	^self name = unNumero name! !
+!II class methodsFor: 'operations' stamp: 'jn 4/8/2021 15:17:41'!
+div: unDividendo
 
-!II class methodsFor: 'operations' stamp: 'jn 4/5/2021 21:59:01'!
+	self < unDividendo ifTrue: [^self error: self descripcionDeErrorDeLaDivisionNoEsNatural] ifFalse: [
+		self = unDividendo ifTrue: [^I] ifFalse:[
+			^(self - unDividendo div: unDividendo) + I
+			]
+		].! !
+
+!II class methodsFor: 'operations' stamp: 'jn 4/8/2021 15:17:45'!
 substractFrom: minuendo
+
 	^self previous substractFrom: minuendo previous! !
 
 
-!II class methodsFor: 'errors' stamp: 'jn 4/8/2021 13:54:45'!
-descripcionDeErrorDeNoSePuedeDividirConResto
-	^self error: 'La division no es entera'! !
+!II class methodsFor: 'errors' stamp: 'jn 4/8/2021 15:17:19'!
+descripcionDeErrorDeLaDivisionNoEsNatural
 
-!II class methodsFor: 'errors' stamp: 'jn 4/8/2021 13:53:40'!
+	^'La division no es natural.'! !
+
+!II class methodsFor: 'errors' stamp: 'jn 4/8/2021 15:17:23'!
 descripcionDeErrorDeNoSePuedeDividirPorUnNumeroMayor
-	^self error: 'No se puede dividir por un numero mayor'! !
+
+	^'No se puede dividir por un numero mayor.'! !
 
 
-!II class methodsFor: 'axioms' stamp: 'jn 4/5/2021 21:07:50'!
+!II class methodsFor: 'axioms' stamp: 'jn 4/8/2021 15:17:09'!
 next
+
 	next ifNil:[
 		next:=self createChildNamed: self name, 'I'.
 		next previous: self.
@@ -126,16 +149,18 @@ next
 	^next
 ! !
 
-!II class methodsFor: 'axioms' stamp: 'jn 4/5/2021 20:58:31'!
+!II class methodsFor: 'axioms' stamp: 'jn 4/8/2021 15:17:12'!
 previous
+
 	^previous! !
 
-!II class methodsFor: 'axioms' stamp: 'jn 4/5/2021 21:03:49'!
+!II class methodsFor: 'axioms' stamp: 'jn 4/8/2021 15:17:15'!
 previous: aPreviousNumber
+
 	previous:=aPreviousNumber! !
 
 
-!II class methodsFor: 'as yet unclassified' stamp: 'jn 4/8/2021 13:58:36'!
+!II class methodsFor: 'as yet unclassified' stamp: 'jn 4/8/2021 15:24:33'!
 initializeCollaboratorsFromFile
 	"Auto generated method for loading purposes - Do not modify it"
 
@@ -156,7 +181,7 @@ II subclass: #III
 III class
 	instanceVariableNames: ''!
 
-!III class methodsFor: 'as yet unclassified' stamp: 'jn 4/8/2021 13:58:36'!
+!III class methodsFor: 'as yet unclassified' stamp: 'jn 4/8/2021 15:24:33'!
 initializeCollaboratorsFromFile
 	"Auto generated method for loading purposes - Do not modify it"
 
@@ -177,7 +202,7 @@ III subclass: #IIII
 IIII class
 	instanceVariableNames: ''!
 
-!IIII class methodsFor: 'as yet unclassified' stamp: 'jn 4/8/2021 13:58:36'!
+!IIII class methodsFor: 'as yet unclassified' stamp: 'jn 4/8/2021 15:24:33'!
 initializeCollaboratorsFromFile
 	"Auto generated method for loading purposes - Do not modify it"
 
@@ -198,7 +223,7 @@ IIII subclass: #IIIII
 IIIII class
 	instanceVariableNames: ''!
 
-!IIIII class methodsFor: 'as yet unclassified' stamp: 'jn 4/8/2021 13:58:36'!
+!IIIII class methodsFor: 'as yet unclassified' stamp: 'jn 4/8/2021 15:24:33'!
 initializeCollaboratorsFromFile
 	"Auto generated method for loading purposes - Do not modify it"
 
@@ -219,7 +244,7 @@ IIIII subclass: #IIIIII
 IIIIII class
 	instanceVariableNames: ''!
 
-!IIIIII class methodsFor: 'as yet unclassified' stamp: 'jn 4/8/2021 13:58:36'!
+!IIIIII class methodsFor: 'as yet unclassified' stamp: 'jn 4/8/2021 15:24:33'!
 initializeCollaboratorsFromFile
 	"Auto generated method for loading purposes - Do not modify it"
 
@@ -240,7 +265,7 @@ IIIIII subclass: #IIIIIII
 IIIIIII class
 	instanceVariableNames: ''!
 
-!IIIIIII class methodsFor: 'as yet unclassified' stamp: 'jn 4/8/2021 13:58:36'!
+!IIIIIII class methodsFor: 'as yet unclassified' stamp: 'jn 4/8/2021 15:24:33'!
 initializeCollaboratorsFromFile
 	"Auto generated method for loading purposes - Do not modify it"
 
@@ -261,7 +286,7 @@ IIIIIII subclass: #IIIIIIII
 IIIIIIII class
 	instanceVariableNames: ''!
 
-!IIIIIIII class methodsFor: 'as yet unclassified' stamp: 'jn 4/8/2021 13:58:36'!
+!IIIIIIII class methodsFor: 'as yet unclassified' stamp: 'jn 4/8/2021 15:24:33'!
 initializeCollaboratorsFromFile
 	"Auto generated method for loading purposes - Do not modify it"
 
@@ -282,7 +307,7 @@ IIIIIIII subclass: #IIIIIIIII
 IIIIIIIII class
 	instanceVariableNames: ''!
 
-!IIIIIIIII class methodsFor: 'as yet unclassified' stamp: 'jn 4/8/2021 13:58:36'!
+!IIIIIIIII class methodsFor: 'as yet unclassified' stamp: 'jn 4/8/2021 15:24:33'!
 initializeCollaboratorsFromFile
 	"Auto generated method for loading purposes - Do not modify it"
 
@@ -303,7 +328,7 @@ IIIIIIIII subclass: #IIIIIIIIII
 IIIIIIIIII class
 	instanceVariableNames: ''!
 
-!IIIIIIIIII class methodsFor: 'as yet unclassified' stamp: 'jn 4/8/2021 13:58:36'!
+!IIIIIIIIII class methodsFor: 'as yet unclassified' stamp: 'jn 4/8/2021 15:24:33'!
 initializeCollaboratorsFromFile
 	"Auto generated method for loading purposes - Do not modify it"
 
@@ -324,7 +349,7 @@ IIIIIIIIII subclass: #IIIIIIIIIII
 IIIIIIIIIII class
 	instanceVariableNames: ''!
 
-!IIIIIIIIIII class methodsFor: 'as yet unclassified' stamp: 'jn 4/8/2021 13:58:36'!
+!IIIIIIIIIII class methodsFor: 'as yet unclassified' stamp: 'jn 4/8/2021 15:24:33'!
 initializeCollaboratorsFromFile
 	"Auto generated method for loading purposes - Do not modify it"
 
@@ -345,7 +370,7 @@ IIIIIIIIIII subclass: #IIIIIIIIIIII
 IIIIIIIIIIII class
 	instanceVariableNames: ''!
 
-!IIIIIIIIIIII class methodsFor: 'as yet unclassified' stamp: 'jn 4/8/2021 13:58:36'!
+!IIIIIIIIIIII class methodsFor: 'as yet unclassified' stamp: 'jn 4/8/2021 15:24:33'!
 initializeCollaboratorsFromFile
 	"Auto generated method for loading purposes - Do not modify it"
 
@@ -366,7 +391,7 @@ IIIIIIIIIIII subclass: #IIIIIIIIIIIII
 IIIIIIIIIIIII class
 	instanceVariableNames: ''!
 
-!IIIIIIIIIIIII class methodsFor: 'as yet unclassified' stamp: 'jn 4/8/2021 13:58:36'!
+!IIIIIIIIIIIII class methodsFor: 'as yet unclassified' stamp: 'jn 4/8/2021 15:24:33'!
 initializeCollaboratorsFromFile
 	"Auto generated method for loading purposes - Do not modify it"
 
@@ -387,7 +412,7 @@ IIIIIIIIIIIII subclass: #IIIIIIIIIIIIII
 IIIIIIIIIIIIII class
 	instanceVariableNames: ''!
 
-!IIIIIIIIIIIIII class methodsFor: 'as yet unclassified' stamp: 'jn 4/8/2021 13:58:37'!
+!IIIIIIIIIIIIII class methodsFor: 'as yet unclassified' stamp: 'jn 4/8/2021 15:24:33'!
 initializeCollaboratorsFromFile
 	"Auto generated method for loading purposes - Do not modify it"
 
@@ -408,7 +433,7 @@ IIIIIIIIIIIIII subclass: #IIIIIIIIIIIIIII
 IIIIIIIIIIIIIII class
 	instanceVariableNames: ''!
 
-!IIIIIIIIIIIIIII class methodsFor: 'as yet unclassified' stamp: 'jn 4/8/2021 13:58:37'!
+!IIIIIIIIIIIIIII class methodsFor: 'as yet unclassified' stamp: 'jn 4/8/2021 15:24:33'!
 initializeCollaboratorsFromFile
 	"Auto generated method for loading purposes - Do not modify it"
 
@@ -429,7 +454,7 @@ IIIIIIIIIIIIIII subclass: #IIIIIIIIIIIIIIII
 IIIIIIIIIIIIIIII class
 	instanceVariableNames: ''!
 
-!IIIIIIIIIIIIIIII class methodsFor: 'as yet unclassified' stamp: 'jn 4/8/2021 13:58:37'!
+!IIIIIIIIIIIIIIII class methodsFor: 'as yet unclassified' stamp: 'jn 4/8/2021 15:24:33'!
 initializeCollaboratorsFromFile
 	"Auto generated method for loading purposes - Do not modify it"
 
@@ -450,7 +475,7 @@ IIIIIIIIIIIIIIII subclass: #IIIIIIIIIIIIIIIII
 IIIIIIIIIIIIIIIII class
 	instanceVariableNames: ''!
 
-!IIIIIIIIIIIIIIIII class methodsFor: 'as yet unclassified' stamp: 'jn 4/8/2021 13:58:37'!
+!IIIIIIIIIIIIIIIII class methodsFor: 'as yet unclassified' stamp: 'jn 4/8/2021 15:24:33'!
 initializeCollaboratorsFromFile
 	"Auto generated method for loading purposes - Do not modify it"
 
@@ -471,7 +496,7 @@ IIIIIIIIIIIIIIIII subclass: #IIIIIIIIIIIIIIIIII
 IIIIIIIIIIIIIIIIII class
 	instanceVariableNames: ''!
 
-!IIIIIIIIIIIIIIIIII class methodsFor: 'as yet unclassified' stamp: 'jn 4/8/2021 13:58:37'!
+!IIIIIIIIIIIIIIIIII class methodsFor: 'as yet unclassified' stamp: 'jn 4/8/2021 15:24:33'!
 initializeCollaboratorsFromFile
 	"Auto generated method for loading purposes - Do not modify it"
 
@@ -492,7 +517,7 @@ IIIIIIIIIIIIIIIIII subclass: #IIIIIIIIIIIIIIIIIII
 IIIIIIIIIIIIIIIIIII class
 	instanceVariableNames: ''!
 
-!IIIIIIIIIIIIIIIIIII class methodsFor: 'as yet unclassified' stamp: 'jn 4/8/2021 13:58:37'!
+!IIIIIIIIIIIIIIIIIII class methodsFor: 'as yet unclassified' stamp: 'jn 4/8/2021 15:24:33'!
 initializeCollaboratorsFromFile
 	"Auto generated method for loading purposes - Do not modify it"
 
@@ -513,7 +538,7 @@ IIIIIIIIIIIIIIIIIII subclass: #IIIIIIIIIIIIIIIIIIII
 IIIIIIIIIIIIIIIIIIII class
 	instanceVariableNames: ''!
 
-!IIIIIIIIIIIIIIIIIIII class methodsFor: 'as yet unclassified' stamp: 'jn 4/8/2021 13:58:37'!
+!IIIIIIIIIIIIIIIIIIII class methodsFor: 'as yet unclassified' stamp: 'jn 4/8/2021 15:24:33'!
 initializeCollaboratorsFromFile
 	"Auto generated method for loading purposes - Do not modify it"
 
@@ -534,7 +559,7 @@ IIIIIIIIIIIIIIIIIIII subclass: #IIIIIIIIIIIIIIIIIIIII
 IIIIIIIIIIIIIIIIIIIII class
 	instanceVariableNames: ''!
 
-!IIIIIIIIIIIIIIIIIIIII class methodsFor: 'as yet unclassified' stamp: 'jn 4/8/2021 13:58:37'!
+!IIIIIIIIIIIIIIIIIIIII class methodsFor: 'as yet unclassified' stamp: 'jn 4/8/2021 15:24:33'!
 initializeCollaboratorsFromFile
 	"Auto generated method for loading purposes - Do not modify it"
 
@@ -555,7 +580,7 @@ IIIIIIIIIIIIIIIIIIIII subclass: #IIIIIIIIIIIIIIIIIIIIII
 IIIIIIIIIIIIIIIIIIIIII class
 	instanceVariableNames: ''!
 
-!IIIIIIIIIIIIIIIIIIIIII class methodsFor: 'as yet unclassified' stamp: 'jn 4/8/2021 13:58:37'!
+!IIIIIIIIIIIIIIIIIIIIII class methodsFor: 'as yet unclassified' stamp: 'jn 4/8/2021 15:24:33'!
 initializeCollaboratorsFromFile
 	"Auto generated method for loading purposes - Do not modify it"
 
@@ -576,7 +601,7 @@ IIIIIIIIIIIIIIIIIIIIII subclass: #IIIIIIIIIIIIIIIIIIIIIII
 IIIIIIIIIIIIIIIIIIIIIII class
 	instanceVariableNames: ''!
 
-!IIIIIIIIIIIIIIIIIIIIIII class methodsFor: 'as yet unclassified' stamp: 'jn 4/8/2021 13:58:37'!
+!IIIIIIIIIIIIIIIIIIIIIII class methodsFor: 'as yet unclassified' stamp: 'jn 4/8/2021 15:24:33'!
 initializeCollaboratorsFromFile
 	"Auto generated method for loading purposes - Do not modify it"
 
@@ -597,7 +622,7 @@ IIIIIIIIIIIIIIIIIIIIIII subclass: #IIIIIIIIIIIIIIIIIIIIIIII
 IIIIIIIIIIIIIIIIIIIIIIII class
 	instanceVariableNames: ''!
 
-!IIIIIIIIIIIIIIIIIIIIIIII class methodsFor: 'as yet unclassified' stamp: 'jn 4/8/2021 13:58:37'!
+!IIIIIIIIIIIIIIIIIIIIIIII class methodsFor: 'as yet unclassified' stamp: 'jn 4/8/2021 15:24:33'!
 initializeCollaboratorsFromFile
 	"Auto generated method for loading purposes - Do not modify it"
 
@@ -618,7 +643,7 @@ IIIIIIIIIIIIIIIIIIIIIIII subclass: #IIIIIIIIIIIIIIIIIIIIIIIII
 IIIIIIIIIIIIIIIIIIIIIIIII class
 	instanceVariableNames: ''!
 
-!IIIIIIIIIIIIIIIIIIIIIIIII class methodsFor: 'as yet unclassified' stamp: 'jn 4/8/2021 13:58:37'!
+!IIIIIIIIIIIIIIIIIIIIIIIII class methodsFor: 'as yet unclassified' stamp: 'jn 4/8/2021 15:24:33'!
 initializeCollaboratorsFromFile
 	"Auto generated method for loading purposes - Do not modify it"
 
@@ -639,7 +664,7 @@ IIIIIIIIIIIIIIIIIIIIIIIII subclass: #IIIIIIIIIIIIIIIIIIIIIIIIII
 IIIIIIIIIIIIIIIIIIIIIIIIII class
 	instanceVariableNames: ''!
 
-!IIIIIIIIIIIIIIIIIIIIIIIIII class methodsFor: 'as yet unclassified' stamp: 'jn 4/8/2021 13:58:37'!
+!IIIIIIIIIIIIIIIIIIIIIIIIII class methodsFor: 'as yet unclassified' stamp: 'jn 4/8/2021 15:24:33'!
 initializeCollaboratorsFromFile
 	"Auto generated method for loading purposes - Do not modify it"
 
@@ -660,7 +685,7 @@ IIIIIIIIIIIIIIIIIIIIIIIIII subclass: #IIIIIIIIIIIIIIIIIIIIIIIIIII
 IIIIIIIIIIIIIIIIIIIIIIIIIII class
 	instanceVariableNames: ''!
 
-!IIIIIIIIIIIIIIIIIIIIIIIIIII class methodsFor: 'as yet unclassified' stamp: 'jn 4/8/2021 13:58:37'!
+!IIIIIIIIIIIIIIIIIIIIIIIIIII class methodsFor: 'as yet unclassified' stamp: 'jn 4/8/2021 15:24:33'!
 initializeCollaboratorsFromFile
 	"Auto generated method for loading purposes - Do not modify it"
 
@@ -681,7 +706,7 @@ IIIIIIIIIIIIIIIIIIIIIIIIIII subclass: #IIIIIIIIIIIIIIIIIIIIIIIIIIII
 IIIIIIIIIIIIIIIIIIIIIIIIIIII class
 	instanceVariableNames: ''!
 
-!IIIIIIIIIIIIIIIIIIIIIIIIIIII class methodsFor: 'as yet unclassified' stamp: 'jn 4/8/2021 13:58:37'!
+!IIIIIIIIIIIIIIIIIIIIIIIIIIII class methodsFor: 'as yet unclassified' stamp: 'jn 4/8/2021 15:24:33'!
 initializeCollaboratorsFromFile
 	"Auto generated method for loading purposes - Do not modify it"
 
