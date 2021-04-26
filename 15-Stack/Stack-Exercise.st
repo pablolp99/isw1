@@ -165,10 +165,10 @@ pop
 	elements removeLast.
 	^ last.! !
 
-!OOStack methodsFor: 'public' stamp: 'plp 4/26/2021 17:01:11'!
+!OOStack methodsFor: 'public' stamp: 'plp 4/26/2021 17:22:28'!
 push: anElement
 	
-	elements addLast: (StackElement with: anElement).
+	elements addLast: (Value with: anElement).
 	! !
 
 !OOStack methodsFor: 'public' stamp: 'plp 4/26/2021 16:52:36'!
@@ -182,11 +182,11 @@ top
 	^ self lastElement! !
 
 
-!OOStack methodsFor: 'initialization' stamp: 'plp 4/26/2021 16:52:03'!
+!OOStack methodsFor: 'initialization' stamp: 'plp 4/26/2021 17:20:14'!
 initialize
 	
 	elements := OrderedCollection new.
-	elements addLast: (StackBase new)! !
+	elements addLast: (Base new)! !
 
 
 !OOStack methodsFor: 'errors' stamp: 'plp 4/26/2021 15:25:49'!
@@ -195,10 +195,10 @@ stackEmptyError
 	self error: self class stackEmptyErrorDescription ! !
 
 
-!OOStack methodsFor: 'private' stamp: 'plp 4/26/2021 16:53:28'!
+!OOStack methodsFor: 'private' stamp: 'plp 4/26/2021 17:21:29'!
 lastElement
 
-	^ elements last isBase! !
+	^ elements last elementValue! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -220,60 +220,73 @@ Object subclass: #SentenceFinderByPrefix
 	category: 'Stack-Exercise'!
 
 
-!classDefinition: #StackBase category: 'Stack-Exercise'!
-Object subclass: #StackBase
+!classDefinition: #StackElement category: 'Stack-Exercise'!
+Object subclass: #StackElement
+	instanceVariableNames: 'elements'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Stack-Exercise'!
+
+!StackElement methodsFor: 'as yet unclassified' stamp: 'plp 4/26/2021 17:24:33'!
+elementValue
+
+	^ self subclassResponsibility! !
+
+
+!classDefinition: #Base category: 'Stack-Exercise'!
+StackElement subclass: #Base
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Stack-Exercise'!
 
-!StackBase methodsFor: 'as yet unclassified' stamp: 'plp 4/26/2021 17:03:42'!
-isBase
+!Base methodsFor: 'as yet unclassified' stamp: 'plp 4/26/2021 17:21:44'!
+elementValue
 
 	self stackEmptyError! !
 
-!StackBase methodsFor: 'as yet unclassified' stamp: 'plp 4/26/2021 17:03:09'!
+!Base methodsFor: 'as yet unclassified' stamp: 'plp 4/26/2021 17:03:09'!
 stackEmptyError
 
 	self error: self class stackEmptyErrorDescription ! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
-!classDefinition: 'StackBase class' category: 'Stack-Exercise'!
-StackBase class
+!classDefinition: 'Base class' category: 'Stack-Exercise'!
+Base class
 	instanceVariableNames: ''!
 
-!StackBase class methodsFor: 'as yet unclassified' stamp: 'plp 4/26/2021 17:03:19'!
+!Base class methodsFor: 'as yet unclassified' stamp: 'plp 4/26/2021 17:03:19'!
 stackEmptyErrorDescription
 	
 	^ 'Stack is empty!!!!!!'! !
 
 
-!classDefinition: #StackElement category: 'Stack-Exercise'!
-Object subclass: #StackElement
+!classDefinition: #Value category: 'Stack-Exercise'!
+StackElement subclass: #Value
 	instanceVariableNames: 'value'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Stack-Exercise'!
 
-!StackElement methodsFor: 'as yet unclassified' stamp: 'plp 4/26/2021 16:58:10'!
+!Value methodsFor: 'as yet unclassified' stamp: 'plp 4/26/2021 17:21:44'!
+elementValue
+
+	^ value! !
+
+!Value methodsFor: 'as yet unclassified' stamp: 'plp 4/26/2021 16:58:10'!
 initializeWith: anElement
 
 	value := anElement! !
 
-!StackElement methodsFor: 'as yet unclassified' stamp: 'plp 4/26/2021 17:04:08'!
-isBase
-
-	^ value! !
-
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
-!classDefinition: 'StackElement class' category: 'Stack-Exercise'!
-StackElement class
+!classDefinition: 'Value class' category: 'Stack-Exercise'!
+Value class
 	instanceVariableNames: 'value'!
 
-!StackElement class methodsFor: 'as yet unclassified' stamp: 'plp 4/26/2021 17:13:34'!
+!Value class methodsFor: 'as yet unclassified' stamp: 'plp 4/26/2021 17:22:28'!
 with: anElement
 
-	^ StackElement new initializeWith: anElement! !
+	^ Value new initializeWith: anElement! !
 
