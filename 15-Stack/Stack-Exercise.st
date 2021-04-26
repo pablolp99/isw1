@@ -147,10 +147,58 @@ TestCase subclass: #SentenceFinderByPrefixTest
 
 !classDefinition: #OOStack category: 'Stack-Exercise'!
 Object subclass: #OOStack
-	instanceVariableNames: ''
+	instanceVariableNames: 'elements'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Stack-Exercise'!
+
+!OOStack methodsFor: 'public' stamp: 'plp 4/26/2021 17:08:14'!
+isEmpty
+	
+	^ self size = 0! !
+
+!OOStack methodsFor: 'public' stamp: 'plp 4/26/2021 15:30:26'!
+pop
+	
+	| last |
+	last := self lastElement.
+	elements removeLast.
+	^ last.! !
+
+!OOStack methodsFor: 'public' stamp: 'plp 4/26/2021 17:01:11'!
+push: anElement
+	
+	elements addLast: (StackElement with: anElement).
+	! !
+
+!OOStack methodsFor: 'public' stamp: 'plp 4/26/2021 16:52:36'!
+size
+
+	^ elements size - 1! !
+
+!OOStack methodsFor: 'public' stamp: 'plp 4/26/2021 17:02:41'!
+top
+	
+	^ self lastElement! !
+
+
+!OOStack methodsFor: 'initialization' stamp: 'plp 4/26/2021 16:52:03'!
+initialize
+	
+	elements := OrderedCollection new.
+	elements addLast: (StackBase new)! !
+
+
+!OOStack methodsFor: 'errors' stamp: 'plp 4/26/2021 15:25:49'!
+stackEmptyError
+
+	self error: self class stackEmptyErrorDescription ! !
+
+
+!OOStack methodsFor: 'private' stamp: 'plp 4/26/2021 16:53:28'!
+lastElement
+
+	^ elements last isBase! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -170,3 +218,62 @@ Object subclass: #SentenceFinderByPrefix
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Stack-Exercise'!
+
+
+!classDefinition: #StackBase category: 'Stack-Exercise'!
+Object subclass: #StackBase
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Stack-Exercise'!
+
+!StackBase methodsFor: 'as yet unclassified' stamp: 'plp 4/26/2021 17:03:42'!
+isBase
+
+	self stackEmptyError! !
+
+!StackBase methodsFor: 'as yet unclassified' stamp: 'plp 4/26/2021 17:03:09'!
+stackEmptyError
+
+	self error: self class stackEmptyErrorDescription ! !
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'StackBase class' category: 'Stack-Exercise'!
+StackBase class
+	instanceVariableNames: ''!
+
+!StackBase class methodsFor: 'as yet unclassified' stamp: 'plp 4/26/2021 17:03:19'!
+stackEmptyErrorDescription
+	
+	^ 'Stack is empty!!!!!!'! !
+
+
+!classDefinition: #StackElement category: 'Stack-Exercise'!
+Object subclass: #StackElement
+	instanceVariableNames: 'value'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Stack-Exercise'!
+
+!StackElement methodsFor: 'as yet unclassified' stamp: 'plp 4/26/2021 16:58:10'!
+initializeWith: anElement
+
+	value := anElement! !
+
+!StackElement methodsFor: 'as yet unclassified' stamp: 'plp 4/26/2021 17:04:08'!
+isBase
+
+	^ value! !
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'StackElement class' category: 'Stack-Exercise'!
+StackElement class
+	instanceVariableNames: 'value'!
+
+!StackElement class methodsFor: 'as yet unclassified' stamp: 'plp 4/26/2021 17:13:34'!
+with: anElement
+
+	^ StackElement new initializeWith: anElement! !
+
