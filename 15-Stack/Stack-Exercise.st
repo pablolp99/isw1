@@ -139,10 +139,96 @@ test10CanNotTopWhenThereAreNoObjectsInTheStack
 
 !classDefinition: #SentenceFinderByPrefixTest category: 'Stack-Exercise'!
 TestCase subclass: #SentenceFinderByPrefixTest
-	instanceVariableNames: ''
+	instanceVariableNames: 'emptyStack sixStringsStack sentenceFinder twoElementStack'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Stack-Exercise'!
+
+!SentenceFinderByPrefixTest methodsFor: 'tests' stamp: 'plp 4/26/2021 18:05:21'!
+test01EmptyStackAnyPrefix
+
+	self assert: (sentenceFinder find: 'Algo' in: emptyStack) isEmpty! !
+
+!SentenceFinderByPrefixTest methodsFor: 'tests' stamp: 'plp 4/26/2021 18:12:52'!
+test02CantFindEmptyPrefix
+
+	self
+		should: [ sentenceFinder find: '' in: emptyStack ]
+		raise: Error
+		withExceptionDo: [ :anError |
+			self assert: anError messageText = SentenceFinderByPrefix prefixIsEmptyDescription ]! !
+
+!SentenceFinderByPrefixTest methodsFor: 'tests' stamp: 'plp 4/26/2021 18:20:52'!
+test03CantFindEmptySpacePrefix
+
+	self
+		should: [ sentenceFinder find: ' ' in: emptyStack ]
+		raise: Error
+		withExceptionDo: [ :anError |
+			self assert: anError messageText = SentenceFinderByPrefix prefixWithSpaceDescription ].
+		
+	self
+		should: [ sentenceFinder find: 'Messi ' in: emptyStack ]
+		raise: Error
+		withExceptionDo: [ :anError |
+			self assert: anError messageText = SentenceFinderByPrefix prefixWithSpaceDescription ]! !
+
+!SentenceFinderByPrefixTest methodsFor: 'tests' stamp: 'plp 4/26/2021 18:25:53'!
+test04MatchesOneString
+	
+	self assert: ( sentenceFinder find: 'win' in: sixStringsStack ) = (OrderedCollection with: 'winning eleven').! !
+
+!SentenceFinderByPrefixTest methodsFor: 'tests' stamp: 'plp 4/26/2021 18:26:45'!
+test05DoesNotMatchAny
+	
+	self assert: ( sentenceFinder find: 'Cr7' in: sixStringsStack ) = (OrderedCollection new).! !
+
+!SentenceFinderByPrefixTest methodsFor: 'tests' stamp: 'plp 4/26/2021 18:30:34'!
+test06MatchesManyStrings
+
+	| comparingResult |
+
+	comparingResult := (OrderedCollection with: 'Me beneficia' with: 'Messirve' with: 'Messierra')	.
+
+	self assert: ( sentenceFinder find: 'Me' in: sixStringsStack ) = comparingResult.! !
+
+!SentenceFinderByPrefixTest methodsFor: 'tests' stamp: 'plp 4/26/2021 18:43:55'!
+test07StackMaintainsOrder
+	
+	| stack |
+	
+	stack := OOStack new.
+	stack push: 'Hola'.
+	stack push: 'Chau'.
+	
+	sentenceFinder find: 'Ho' in: twoElementStack .
+	
+	stack size timesRepeat: 	[ self assert: (stack pop) = twoElementStack pop].! !
+
+!SentenceFinderByPrefixTest methodsFor: 'tests' stamp: 'plp 4/26/2021 18:45:58'!
+test08StringExistsButPrefixNot
+
+	self assert: ( sentenceFinder find: 'eleven' in: sixStringsStack ) = (OrderedCollection new).! !
+
+
+!SentenceFinderByPrefixTest methodsFor: 'setup' stamp: 'plp 4/26/2021 18:42:41'!
+setUp
+	
+	sentenceFinder := SentenceFinderByPrefix new.
+	
+	emptyStack := OOStack new.
+	
+	twoElementStack := OOStack new.
+	twoElementStack push: 'Hola'.
+	twoElementStack push: 'Chau'.
+	
+	sixStringsStack := OOStack new.
+	sixStringsStack push: 'Winter is here'.
+	sixStringsStack push: 'Winning eleven'.
+	sixStringsStack push: 'winning eleven'.
+	sixStringsStack push: 'Messierra'.
+	sixStringsStack push: 'Messirve'.
+	sixStringsStack push: 'Me beneficia'.! !
 
 
 !classDefinition: #OOStack category: 'Stack-Exercise'!
@@ -218,6 +304,44 @@ Object subclass: #SentenceFinderByPrefix
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Stack-Exercise'!
+
+!SentenceFinderByPrefix methodsFor: 'as yet unclassified' stamp: 'plp 4/26/2021 18:19:35'!
+find: aPrefix in: aStack
+
+	| reverseStack stackSize aStackElement prefixCollection |
+
+	(aPrefix = '') ifTrue: [self error: self class prefixIsEmptyDescription].
+	(aPrefix includesSubString: ' ') ifTrue: [self error: self class prefixWithSpaceDescription ].
+	
+	stackSize := aStack size.
+	reverseStack := OOStack new.
+	prefixCollection := OrderedCollection new.
+	
+	stackSize timesRepeat: 	[
+			aStackElement := (aStack pop).
+			reverseStack push: aStackElement.		
+			prefixCollection addLast: aStackElement ].
+		
+	stackSize timesRepeat: 	[
+			aStack push: reverseStack pop ].
+
+	^ prefixCollection select: [ :aString | aString beginsWith: aPrefix ].! !
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'SentenceFinderByPrefix class' category: 'Stack-Exercise'!
+SentenceFinderByPrefix class
+	instanceVariableNames: ''!
+
+!SentenceFinderByPrefix class methodsFor: 'as yet unclassified' stamp: 'plp 4/26/2021 18:09:38'!
+prefixIsEmptyDescription
+
+	^ 'Prefijo esta vacio!!!!!!'! !
+
+!SentenceFinderByPrefix class methodsFor: 'as yet unclassified' stamp: 'plp 4/26/2021 18:19:15'!
+prefixWithSpaceDescription
+
+	^ 'El prefijo contiene un espacio!!!!!!'! !
 
 
 !classDefinition: #StackElement category: 'Stack-Exercise'!

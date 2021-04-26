@@ -10,16 +10,14 @@ No se pueden modificar los tests.
 Ayudas:
 1) Primero hagan pasar todos los tests usando if y después apliquen la
 técnica para sacar if que vimos.
-2) Si les sirve, utilicen una metáfora. Una muy útil es la de representar el juego de los
-bebes donde se apilan platos en una especie de torre de Hanoi.
+2) Si les sirve, utilicen una metáfora. Una muy útil es la de representar el juego de los bebes donde se apilan platos en una especie de torre de Hanoi.
 
 Importante: Tampoco se puede usar handleo de excepciones para ocultar lo que
 sería en definitiva un if
 
 b) El Stack de la primera parte es utilizado para almacenar oraciones de cualquier longitud. 
 
-Se debe implementar el mensaje find d
-e SentenceFinderByPrefix que dado un prefijo se encarga de devolver todas las oraciones almacenadas en el Stack que contengan dicho prefijo.
+Se debe implementar el mensaje find de SentenceFinderByPrefix que dado un prefijo se encarga de devolver todas las oraciones almacenadas en el Stack que contengan dicho prefijo.
 
 Por ej. si el prefijo es 'Wint', y las oraciones en el Stack son 'winter is coming', 'winning is everything', 'The winds of Winter' y 'Winter is here' sólo debería devolver la última.
 
