@@ -139,18 +139,13 @@ test10CanNotTopWhenThereAreNoObjectsInTheStack
 
 !classDefinition: #SentenceFinderByPrefixTest category: 'Stack-Exercise'!
 TestCase subclass: #SentenceFinderByPrefixTest
-	instanceVariableNames: 'emptyStack sixStringsStack sentenceFinder twoElementStack'
+	instanceVariableNames: 'emptyStack sixStringsStack sentenceFinder twoElementStack oneElementStack'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Stack-Exercise'!
 
-!SentenceFinderByPrefixTest methodsFor: 'tests' stamp: 'plp 4/26/2021 18:05:21'!
-test01EmptyStackAnyPrefix
-
-	self assert: (sentenceFinder find: 'Algo' in: emptyStack) isEmpty! !
-
-!SentenceFinderByPrefixTest methodsFor: 'tests' stamp: 'plp 4/26/2021 18:12:52'!
-test02CantFindEmptyPrefix
+!SentenceFinderByPrefixTest methodsFor: 'tests' stamp: 'plp 4/26/2021 21:16:35'!
+test001EmptyPrefixInEmptyStackRaisesError
 
 	self
 		should: [ sentenceFinder find: '' in: emptyStack ]
@@ -158,8 +153,13 @@ test02CantFindEmptyPrefix
 		withExceptionDo: [ :anError |
 			self assert: anError messageText = SentenceFinderByPrefix prefixIsEmptyDescription ]! !
 
-!SentenceFinderByPrefixTest methodsFor: 'tests' stamp: 'plp 4/26/2021 18:20:52'!
-test03CantFindEmptySpacePrefix
+!SentenceFinderByPrefixTest methodsFor: 'tests' stamp: 'plp 4/26/2021 21:16:40'!
+test002CantFindValidPrefixInEmptyStack
+
+	self assert: (sentenceFinder find: 'Algo' in: emptyStack) isEmpty! !
+
+!SentenceFinderByPrefixTest methodsFor: 'tests' stamp: 'plp 4/26/2021 21:08:36'!
+test003BlankSpacePrefixInEmptyStackRaisesError
 
 	self
 		should: [ sentenceFinder find: ' ' in: emptyStack ]
@@ -173,27 +173,73 @@ test03CantFindEmptySpacePrefix
 		withExceptionDo: [ :anError |
 			self assert: anError messageText = SentenceFinderByPrefix prefixWithSpaceDescription ]! !
 
-!SentenceFinderByPrefixTest methodsFor: 'tests' stamp: 'plp 4/26/2021 18:25:53'!
-test04MatchesOneString
+!SentenceFinderByPrefixTest methodsFor: 'tests' stamp: 'plp 4/26/2021 21:09:46'!
+test004EmptyPrefixInOneElementStackRaisesError
+
+	self
+		should: [ sentenceFinder find: '' in: oneElementStack ]
+		raise: Error
+		withExceptionDo: [ :anError |
+			self assert: anError messageText = SentenceFinderByPrefix prefixIsEmptyDescription ].! !
+
+!SentenceFinderByPrefixTest methodsFor: 'tests' stamp: 'plp 4/26/2021 21:10:21'!
+test005BlankSpacePrefixInOneElementStackRaisesError
+
+	self
+		should: [ sentenceFinder find: ' ' in: oneElementStack ]
+		raise: Error
+		withExceptionDo: [ :anError |
+			self assert: anError messageText = SentenceFinderByPrefix prefixWithSpaceDescription ].! !
+
+!SentenceFinderByPrefixTest methodsFor: 'tests' stamp: 'plp 4/26/2021 21:10:59'!
+test006ValidPrefixInOneElementStackMatch
+
+	self assert: (sentenceFinder find: 'One' in: oneElementStack) = (OrderedCollection with: 'One').! !
+
+!SentenceFinderByPrefixTest methodsFor: 'tests' stamp: 'plp 4/26/2021 21:11:21'!
+test007ValidPrefixInOneElementStackDoesNotMatch
+
+	self assert: (sentenceFinder find: 'Two' in: oneElementStack) = (OrderedCollection new).! !
+
+!SentenceFinderByPrefixTest methodsFor: 'tests' stamp: 'plp 4/26/2021 21:12:35'!
+test008EmptyPrefixInNonEmptyStackRaisesError
+
+	self
+		should: [ sentenceFinder find: '' in: sixStringsStack ]
+		raise: Error
+		withExceptionDo: [ :anError |
+			self assert: anError messageText = SentenceFinderByPrefix prefixIsEmptyDescription ].! !
+
+!SentenceFinderByPrefixTest methodsFor: 'tests' stamp: 'plp 4/26/2021 21:13:09'!
+test009BlankSpacePrefixInNonEmptyStackRaisesError
+	
+	self
+		should: [ sentenceFinder find: ' ' in: sixStringsStack ]
+		raise: Error
+		withExceptionDo: [ :anError |
+			self assert: anError messageText = SentenceFinderByPrefix prefixWithSpaceDescription ].! !
+
+!SentenceFinderByPrefixTest methodsFor: 'tests' stamp: 'plp 4/26/2021 21:13:47'!
+test010ValidPrefixInNonEmptyStackMatchesOneString
 	
 	self assert: ( sentenceFinder find: 'win' in: sixStringsStack ) = (OrderedCollection with: 'winning eleven').! !
 
-!SentenceFinderByPrefixTest methodsFor: 'tests' stamp: 'plp 4/26/2021 18:26:45'!
-test05DoesNotMatchAny
+!SentenceFinderByPrefixTest methodsFor: 'tests' stamp: 'plp 4/26/2021 21:14:15'!
+test011ValidPrefixInNonEmptyStackDoesNotMatch
 	
 	self assert: ( sentenceFinder find: 'Cr7' in: sixStringsStack ) = (OrderedCollection new).! !
 
-!SentenceFinderByPrefixTest methodsFor: 'tests' stamp: 'plp 4/26/2021 18:30:34'!
-test06MatchesManyStrings
+!SentenceFinderByPrefixTest methodsFor: 'tests' stamp: 'plp 4/26/2021 21:48:01'!
+test012ValidPrefixInNonEmptyStackMatchesMultipleStrings
 
 	| comparingResult |
 
-	comparingResult := (OrderedCollection with: 'Me beneficia' with: 'Messirve' with: 'Messierra')	.
+	comparingResult := (OrderedCollection with: 'Messierra' with: 'Messirve' with: 'Me beneficia')	.
 
 	self assert: ( sentenceFinder find: 'Me' in: sixStringsStack ) = comparingResult.! !
 
-!SentenceFinderByPrefixTest methodsFor: 'tests' stamp: 'plp 4/26/2021 18:43:55'!
-test07StackMaintainsOrder
+!SentenceFinderByPrefixTest methodsFor: 'tests' stamp: 'plp 4/26/2021 21:16:24'!
+test013NonEmptyStackPreservesAfterFind
 	
 	| stack |
 	
@@ -205,18 +251,16 @@ test07StackMaintainsOrder
 	
 	stack size timesRepeat: 	[ self assert: (stack pop) = twoElementStack pop].! !
 
-!SentenceFinderByPrefixTest methodsFor: 'tests' stamp: 'plp 4/26/2021 18:45:58'!
-test08StringExistsButPrefixNot
 
-	self assert: ( sentenceFinder find: 'eleven' in: sixStringsStack ) = (OrderedCollection new).! !
-
-
-!SentenceFinderByPrefixTest methodsFor: 'setup' stamp: 'plp 4/26/2021 18:42:41'!
+!SentenceFinderByPrefixTest methodsFor: 'setup' stamp: 'plp 4/26/2021 21:02:22'!
 setUp
 	
 	sentenceFinder := SentenceFinderByPrefix new.
 	
 	emptyStack := OOStack new.
+	
+	oneElementStack := OOStack new.
+	oneElementStack push: 'One'.
 	
 	twoElementStack := OOStack new.
 	twoElementStack push: 'Hola'.
@@ -275,12 +319,6 @@ initialize
 	elements addLast: (Base new)! !
 
 
-!OOStack methodsFor: 'errors' stamp: 'plp 4/26/2021 15:25:49'!
-stackEmptyError
-
-	self error: self class stackEmptyErrorDescription ! !
-
-
 !OOStack methodsFor: 'private' stamp: 'plp 4/26/2021 17:21:29'!
 lastElement
 
@@ -305,27 +343,65 @@ Object subclass: #SentenceFinderByPrefix
 	poolDictionaries: ''
 	category: 'Stack-Exercise'!
 
-!SentenceFinderByPrefix methodsFor: 'as yet unclassified' stamp: 'plp 4/26/2021 18:19:35'!
+!SentenceFinderByPrefix methodsFor: 'private' stamp: 'plp 4/26/2021 21:45:57'!
+dumpStringsFrom: aStack
+
+	| reversedStack stringsCollection |
+	reversedStack := OOStack new.
+	stringsCollection := OrderedCollection new.
+		
+	aStack size timesRepeat: 	[ self popStringFrom: aStack pushTo: reversedStack andAddTo: stringsCollection ].
+		
+	self reverseStack: reversedStack to: aStack.
+	
+	^ stringsCollection ! !
+
+!SentenceFinderByPrefix methodsFor: 'private' stamp: 'plp 4/26/2021 21:21:53'!
+findPrefix: aPrefix in: stringsCollection
+	
+	^ stringsCollection select: [ :aString | aString beginsWith: aPrefix ].! !
+
+!SentenceFinderByPrefix methodsFor: 'private' stamp: 'plp 4/26/2021 21:19:34'!
+hasPrefixSpaces: aPrefix
+
+	(aPrefix includesSubString: ' ') ifTrue: [self error: self class prefixWithSpaceDescription ].! !
+
+!SentenceFinderByPrefix methodsFor: 'private' stamp: 'plp 4/26/2021 21:19:06'!
+isPrefixEmpty: aPrefix
+
+	(aPrefix = '') ifTrue: [self error: self class prefixIsEmptyDescription].! !
+
+!SentenceFinderByPrefix methodsFor: 'private' stamp: 'plp 4/26/2021 21:18:50'!
+isPrefixValid: aPrefix
+
+	self hasPrefixSpaces: aPrefix.
+	self isPrefixEmpty: aPrefix.! !
+
+!SentenceFinderByPrefix methodsFor: 'private' stamp: 'plp 4/26/2021 21:47:04'!
+popStringFrom: aStack pushTo: aReversedStack andAddTo: stringsCollection
+
+	| aStackElement |
+
+	aStackElement := (aStack pop).
+	aReversedStack push: aStackElement.	
+	stringsCollection addFirst: aStackElement.! !
+
+!SentenceFinderByPrefix methodsFor: 'private' stamp: 'plp 4/26/2021 21:33:31'!
+reverseStack: aReversedStack to: aStack
+
+	aReversedStack size timesRepeat: 	[ aStack push: aReversedStack pop ]! !
+
+
+!SentenceFinderByPrefix methodsFor: 'public' stamp: 'plp 4/26/2021 21:46:24'!
 find: aPrefix in: aStack
 
-	| reverseStack stackSize aStackElement prefixCollection |
+	| stringsCollection |
 
-	(aPrefix = '') ifTrue: [self error: self class prefixIsEmptyDescription].
-	(aPrefix includesSubString: ' ') ifTrue: [self error: self class prefixWithSpaceDescription ].
+	self isPrefixValid: aPrefix.
 	
-	stackSize := aStack size.
-	reverseStack := OOStack new.
-	prefixCollection := OrderedCollection new.
-	
-	stackSize timesRepeat: 	[
-			aStackElement := (aStack pop).
-			reverseStack push: aStackElement.		
-			prefixCollection addLast: aStackElement ].
-		
-	stackSize timesRepeat: 	[
-			aStack push: reverseStack pop ].
+	stringsCollection := self dumpStringsFrom: aStack.
 
-	^ prefixCollection select: [ :aString | aString beginsWith: aPrefix ].! !
+	^ self findPrefix: aPrefix in: stringsCollection ! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -351,7 +427,7 @@ Object subclass: #StackElement
 	poolDictionaries: ''
 	category: 'Stack-Exercise'!
 
-!StackElement methodsFor: 'as yet unclassified' stamp: 'plp 4/26/2021 17:24:33'!
+!StackElement methodsFor: 'public' stamp: 'plp 4/26/2021 17:24:33'!
 elementValue
 
 	^ self subclassResponsibility! !
@@ -364,15 +440,16 @@ StackElement subclass: #Base
 	poolDictionaries: ''
 	category: 'Stack-Exercise'!
 
-!Base methodsFor: 'as yet unclassified' stamp: 'plp 4/26/2021 17:21:44'!
-elementValue
-
-	self stackEmptyError! !
-
-!Base methodsFor: 'as yet unclassified' stamp: 'plp 4/26/2021 17:03:09'!
+!Base methodsFor: 'errors' stamp: 'plp 4/26/2021 17:03:09'!
 stackEmptyError
 
 	self error: self class stackEmptyErrorDescription ! !
+
+
+!Base methodsFor: 'public' stamp: 'plp 4/26/2021 17:21:44'!
+elementValue
+
+	self stackEmptyError! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -393,12 +470,13 @@ StackElement subclass: #Value
 	poolDictionaries: ''
 	category: 'Stack-Exercise'!
 
-!Value methodsFor: 'as yet unclassified' stamp: 'plp 4/26/2021 17:21:44'!
+!Value methodsFor: 'public' stamp: 'plp 4/26/2021 17:21:44'!
 elementValue
 
 	^ value! !
 
-!Value methodsFor: 'as yet unclassified' stamp: 'plp 4/26/2021 16:58:10'!
+
+!Value methodsFor: 'initialization' stamp: 'plp 4/26/2021 16:58:10'!
 initializeWith: anElement
 
 	value := anElement! !
