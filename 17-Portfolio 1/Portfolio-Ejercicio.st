@@ -1,22 +1,97 @@
 !classDefinition: #PortfolioTest category: 'Portfolio-Ejercicio'!
 TestCase subclass: #PortfolioTest
-	instanceVariableNames: ''
+	instanceVariableNames: 'accountWithDepositAndWithdraw anotherAccountWithDeposit accountDeposit accountWithdraw anotherAccountDeposit'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Portfolio-Ejercicio'!
 
-!PortfolioTest methodsFor: 'tests' stamp: 'jn 5/23/2021 17:15:52'!
-test01portfolioHasZeroBalanceWhenCreated
+!PortfolioTest methodsFor: 'private' stamp: 'jn 5/24/2021 17:16:56'!
+addAccountTo: aChildPortfolio andAnotherAccountTo: aPortfolio
 
+	aChildPortfolio add: accountWithDepositAndWithdraw .
+	aPortfolio add: aChildPortfolio.
+	aPortfolio add: anotherAccountWithDeposit.
+	
+		
+
+	! !
+
+!PortfolioTest methodsFor: 'private' stamp: 'jn 5/24/2021 17:11:04'!
+addAndAssertDuplicatedAdd: anAddClosure
+	
+	anAddClosure value.
+	
+	self assertDuplicatedAdd: anAddClosure.
+
+	
+
+	! !
+
+!PortfolioTest methodsFor: 'private' stamp: 'jn 5/24/2021 17:16:56'!
+addTwoAccountsTo: aPortfolio
+
+	aPortfolio add: accountWithDepositAndWithdraw.
+	aPortfolio add: anotherAccountWithDeposit.
+	
+	
+	! !
+
+!PortfolioTest methodsFor: 'private' stamp: 'jn 5/24/2021 17:11:15'!
+assertDuplicatedAdd: anAddClosure
+	
+	self should: [ 	anAddClosure value. ] 
+		raise: Error
+		withExceptionDo: [ :error | 
+			self assert: error messageText equals: Portfolio financialAccountAlreadyExistsDescription  ] 
+
+	
+
+	! !
+
+!PortfolioTest methodsFor: 'private' stamp: 'jn 5/24/2021 17:16:56'!
+assertSumOfBalancesOfAccountsEqualstToBalanceOf: portfolio
+	
+	self assert: (accountWithDepositAndWithdraw balance + anotherAccountWithDeposit balance) equals: portfolio balance.
+	
+	! !
+
+!PortfolioTest methodsFor: 'private' stamp: 'jn 5/24/2021 17:17:08'!
+assertTransactionsOf: portfolio
+	
+	| transactions |
+	transactions := portfolio transactions.
+	
+	self assert: transactions size equals: 3.
+	self assert: transactions includes: accountDeposit.
+	self assert: transactions includes: accountWithdraw.
+	self assert: transactions includes: anotherAccountDeposit.
+	! !
+
+
+!PortfolioTest methodsFor: 'tests' stamp: 'jn 5/24/2021 17:17:08'!
+setUp
+	
+	accountWithDepositAndWithdraw := ReceptiveAccount new.
+	accountDeposit := Deposit register: 100 on: accountWithDepositAndWithdraw.
+	accountWithdraw := Withdraw register: 50 on: accountWithDepositAndWithdraw.
+	
+	anotherAccountWithDeposit := ReceptiveAccount new.
+	anotherAccountDeposit := Deposit register: 30 on: anotherAccountWithDeposit.
+
+	! !
+
+!PortfolioTest methodsFor: 'tests' stamp: 'jn 5/24/2021 16:46:23'!
+test01portfolioHasZeroBalanceWhenCreated
+	
 	| portfolio |
 	
 	portfolio := Portfolio new.
-	
+
 	self assert: portfolio balance equals: 0.
 
 	! !
 
-!PortfolioTest methodsFor: 'tests' stamp: 'jn 5/23/2021 17:17:31'!
+!PortfolioTest methodsFor: 'tests' stamp: 'jn 5/24/2021 16:46:33'!
 test02portfolioHasNoneTransactionsWhenCreated
 
 	| portfolio |
@@ -27,230 +102,148 @@ test02portfolioHasNoneTransactionsWhenCreated
 
 	! !
 
-!PortfolioTest methodsFor: 'tests' stamp: 'jn 5/23/2021 17:18:46'!
+!PortfolioTest methodsFor: 'tests' stamp: 'jn 5/24/2021 17:14:12'!
 test03portfolioHasBalanceEqualsToSumOfAccountsBalance
-
-	| portfolio account anotherAccount |
+	
+	| portfolio |
 	
 	portfolio := Portfolio new.
-	account := ReceptiveAccount new.
-	anotherAccount := ReceptiveAccount new.
 
-	Deposit register: 100 on: account.
-	Withdraw register: 50 on: account.
-		
-	portfolio add: account.
-	portfolio add: anotherAccount.
-	
-	Deposit register: 30 on: anotherAccount.
+	self addTwoAccountsTo: portfolio.
 
-	self assert: (account balance + anotherAccount balance) equals: portfolio balance.
+	self assertSumOfBalancesOfAccountsEqualstToBalanceOf: portfolio.
 	
 	! !
 
-!PortfolioTest methodsFor: 'tests' stamp: 'jn 5/24/2021 00:18:20'!
+!PortfolioTest methodsFor: 'tests' stamp: 'jn 5/24/2021 17:14:18'!
 test04portfolioTransactionsEqualsToAllAccountsTransactions
 
-	| portfolio account anotherAccount aDeposit aWithdraw anotherDeposit |
+	| portfolio |
 	
 	portfolio := Portfolio new.
-	account := ReceptiveAccount new.
-	anotherAccount := ReceptiveAccount new.
-
-	aDeposit := Deposit register: 100 on: account.
-	aWithdraw := Withdraw register: 50 on: account.
 		
-	portfolio add: account.
-	portfolio add: anotherAccount.
+	self addTwoAccountsTo: portfolio.
 	
-	anotherDeposit := Deposit register: 30 on: anotherAccount.
-		
-	self assert: portfolio transactions size equals: 3.
-	self assert: portfolio transactions includes: aDeposit.
-	self assert: portfolio transactions includes: aWithdraw.
-	self assert: portfolio transactions includes: anotherDeposit.
+	self assertTransactionsOf: portfolio.
+
 	! !
 
-!PortfolioTest methodsFor: 'tests' stamp: 'jn 5/23/2021 17:24:15'!
+!PortfolioTest methodsFor: 'tests' stamp: 'jn 5/24/2021 17:17:08'!
 test05portfolioKnowsRegisteredTransactionsInAccounts
 
-	| portfolio account anotherAccount deposit1 deposit2 withdraw |
+	| portfolio |
 	
 	portfolio := Portfolio new.
-	account := ReceptiveAccount new.
-	anotherAccount := ReceptiveAccount new.
-
-	deposit1 := Deposit register: 100 on: account.
-	withdraw := Withdraw register: 50 on: account.
-		
-	portfolio add: account.
-	portfolio add: anotherAccount.
 	
-	deposit2 := Deposit register: 30 on: anotherAccount.
+	self addTwoAccountsTo: portfolio.
 		
-	self assert: (portfolio hasRegistered: deposit1).
-	self assert: (portfolio hasRegistered: deposit2).
-	self assert: (portfolio hasRegistered: withdraw).
+	self assert: (portfolio hasRegistered: accountDeposit).
+	self assert: (portfolio hasRegistered: accountWithdraw).
+	self assert: (portfolio hasRegistered: anotherAccountDeposit).
 
 	! !
 
-!PortfolioTest methodsFor: 'tests' stamp: 'jn 5/23/2021 17:23:53'!
+!PortfolioTest methodsFor: 'tests' stamp: 'jn 5/24/2021 17:17:08'!
 test06portfolioDoesNotKnowNotRegisteredTransactionsInAccounts
 
-	| deposit withdraw portfolio |
+	| portfolio |
 	
 	portfolio := Portfolio new.
-	deposit :=  Deposit for: 200.
-	withdraw := Withdraw for: 50.
-		
-	self deny: (portfolio hasRegistered: deposit).
-	self deny: (portfolio hasRegistered:withdraw).
-
+	
+	self deny: (portfolio hasRegistered: accountDeposit).
+	self deny: (portfolio hasRegistered: accountWithdraw).
+	self deny: (portfolio hasRegistered: anotherAccountDeposit).
 	! !
 
-!PortfolioTest methodsFor: 'tests' stamp: 'jn 5/23/2021 17:46:53'!
+!PortfolioTest methodsFor: 'tests' stamp: 'jn 5/24/2021 16:47:19'!
 test07portfolioOnlyAcceptsValidReceptiveAccounts
 
 	| portfolio |
 	
 	portfolio := Portfolio new.
-
+	
 	self should: [ portfolio add: 'invalid account' ] 
 		raise: Error
 		withExceptionDo: [ :error | self assert: error class equals: MessageNotUnderstood ] 	
 
 	! !
 
-!PortfolioTest methodsFor: 'tests' stamp: 'jn 5/24/2021 15:08:11'!
+!PortfolioTest methodsFor: 'tests' stamp: 'jn 5/24/2021 17:18:18'!
 test08portolioDoesNotAcceptsDuplicatedAccounts
-
-	| portfolio account |
-	
-	portfolio := Portfolio new.
-	account := ReceptiveAccount new.
-
-	portfolio add: account.
-	
-	self should: [ portfolio add: account ] 
-		raise: Error
-		withExceptionDo: [ :error | 
-			self assert: error messageText equals: Portfolio financialAccountAlreadyExistsDescription  ] 	
-
-	! !
-
-!PortfolioTest methodsFor: 'tests' stamp: 'jn 5/23/2021 18:27:14'!
-test09portfolioHasBalanceEqualsToBalancesOfPortfoliosAndAccounts
-
-	| portfolio childPortfolio account anotherAccount|
-	
-	portfolio := Portfolio new.
-	childPortfolio := Portfolio new.
-
-	account := ReceptiveAccount new.
-	Deposit register: 100 on: account.
-	Withdraw register: 50 on: account.
-	
-	anotherAccount := ReceptiveAccount new.
-	Deposit register: 90 on: anotherAccount.
-
-	childPortfolio add: account.
-	portfolio add: childPortfolio.
-	portfolio add: anotherAccount.
-	
-	self assert: portfolio balance equals: (account balance + anotherAccount balance).	
-		
-
-	! !
-
-!PortfolioTest methodsFor: 'tests' stamp: 'jn 5/24/2021 00:17:17'!
-test10portfolioTransactionsEqualsToTransactionsOfPortfoliosAndAccounts
-
-	| portfolio childPortfolio account anotherAccount aDeposit aWithdraw anotherDeposit |
-	
-	portfolio := Portfolio new.
-	childPortfolio := Portfolio new.
-
-	account := ReceptiveAccount new.
-	aDeposit := Deposit register: 100 on: account.
-	aWithdraw := Withdraw register: 50 on: account.
-	
-	anotherAccount := ReceptiveAccount new.
-	anotherDeposit := Deposit register: 90 on: anotherAccount.
-
-	childPortfolio add: account.
-	portfolio add: childPortfolio.
-	portfolio add: anotherAccount.
-	
-	self assert: portfolio transactions size equals: 3.
-	self assert: portfolio transactions includes: aDeposit.
-	self assert: portfolio transactions includes: aWithdraw.
-	self assert: portfolio transactions includes: anotherDeposit.
-		
-
-	! !
-
-!PortfolioTest methodsFor: 'tests' stamp: 'jn 5/24/2021 15:24:20'!
-test11portfolioOnlyAcceptsValidPortfolios
 
 	| portfolio |
 	
 	portfolio := Portfolio new.
 
-	self should: [ portfolio add: 'invalid portfolio' ] 
-		raise: Error
-		withExceptionDo: [ :error | self assert: error class equals: MessageNotUnderstood ] 	
+	self addAndAssertDuplicatedAdd: [	 portfolio add: accountWithDepositAndWithdraw. ].
+	
 
 	! !
 
-!PortfolioTest methodsFor: 'tests' stamp: 'jn 5/24/2021 15:24:31'!
-test12portfolioDoesNotAcceptsDuplicatedPortfolios
+!PortfolioTest methodsFor: 'tests' stamp: 'jn 5/24/2021 17:16:08'!
+test09portfolioHasBalanceEqualsToBalancesOfPortfoliosAndAccounts
+
+	| portfolio childPortfolio |
+	
+	portfolio := Portfolio new.
+	childPortfolio := Portfolio new.
+
+	self addAccountTo: childPortfolio andAnotherAccountTo: portfolio.
+	
+	self assertSumOfBalancesOfAccountsEqualstToBalanceOf: portfolio.
+		
+
+	! !
+
+!PortfolioTest methodsFor: 'tests' stamp: 'jn 5/24/2021 17:16:18'!
+test10portfolioTransactionsEqualsToTransactionsOfPortfoliosAndAccounts
+
+	| portfolio childPortfolio |	
+	
+	portfolio := Portfolio new.
+	childPortfolio := Portfolio new.
+
+	self addAccountTo: childPortfolio andAnotherAccountTo: portfolio.
+	
+	self assertTransactionsOf: portfolio.
+
+		
+
+	! !
+
+!PortfolioTest methodsFor: 'tests' stamp: 'jn 5/24/2021 17:18:03'!
+test11portfolioDoesNotAcceptsDuplicatedPortfolios
 
 	| portfolio anotherPortfolio |
 	
 	portfolio := Portfolio new.
 	anotherPortfolio := Portfolio new.
 
-	portfolio add: anotherPortfolio.
-
-	self should: [ portfolio add: anotherPortfolio ] 
-		raise: Error
-		withExceptionDo: [ :error | 
-			self assert: error messageText equals: Portfolio financialAccountAlreadyExistsDescription  ] 
+	self addAndAssertDuplicatedAdd: [	 portfolio add: anotherPortfolio. ].
+	
 
 	! !
 
-!PortfolioTest methodsFor: 'tests' stamp: 'jn 5/24/2021 15:27:32'!
-test13portfolioDoesNotAcceptsDuplicatedAccountingsRecursively
+!PortfolioTest methodsFor: 'tests' stamp: 'jn 5/24/2021 17:16:56'!
+test12portfolioDoesNotAcceptsDuplicatedAccountingsRecursively
 
-	| portfolio1 portfolio2 portfolio3 portfolio4 account anotherAccount |
+	| portfolio portfolio2 portfolio3 portfolio4 |
 	
-	portfolio1 := Portfolio new.
+	portfolio := Portfolio new.
 	portfolio2 := Portfolio new.
 	portfolio3 := Portfolio new.
 	portfolio4 := Portfolio new.
-
-	account := ReceptiveAccount new.
-	anotherAccount := ReceptiveAccount new.
-
-	Deposit register: 100 on: account.
-	Withdraw register: 50 on: account.
-		
-	portfolio2 add: account.
-	portfolio4 add: anotherAccount.
 	
-	portfolio1 add: portfolio2.
+	portfolio2 add: accountWithDepositAndWithdraw.
+	portfolio4 add: anotherAccountWithDeposit.
+	
+	portfolio add: portfolio2.
 	portfolio3 add: portfolio4.
 	portfolio3 add: portfolio2.
 
-	self should: [ 	portfolio1 add: portfolio3. ] 
-		raise: Error
-		withExceptionDo: [ :error | 
-			self assert: error messageText equals: Portfolio financialAccountAlreadyExistsDescription  ].
-	
-	self should: [ 		portfolio3 add: anotherAccount ] 
-		raise: Error
-		withExceptionDo: [ :error | 
-			self assert: error messageText equals: Portfolio financialAccountAlreadyExistsDescription  ]
+	self assertDuplicatedAdd: [ 	portfolio add: portfolio3. ].
+	self assertDuplicatedAdd: [ 		portfolio3 add: anotherAccountWithDeposit ].
+		
 
 
 	! !
@@ -458,6 +451,22 @@ Object subclass: #FinancialAccount
 	poolDictionaries: ''
 	category: 'Portfolio-Ejercicio'!
 
+!FinancialAccount methodsFor: 'duplicated - private' stamp: 'jn 5/24/2021 16:03:30'!
+addParent: aFinancialAccount
+
+	self subclassResponsibility ! !
+
+!FinancialAccount methodsFor: 'duplicated - private' stamp: 'jn 5/24/2021 16:02:55'!
+hasDuplicatedWith: aFinancialAccount
+
+	self subclassResponsibility ! !
+
+!FinancialAccount methodsFor: 'duplicated - private' stamp: 'jn 5/24/2021 16:02:44'!
+relatedWith: aFinancialAccount
+
+	self subclassResponsibility ! !
+
+
 !FinancialAccount methodsFor: 'transactions' stamp: 'jn 5/24/2021 00:28:06'!
 transactions
 
@@ -503,18 +512,18 @@ initialize
 ! !
 
 
-!Portfolio methodsFor: 'balance' stamp: 'jn 5/24/2021 14:35:32'!
+!Portfolio methodsFor: 'balance' stamp: 'jn 5/24/2021 15:49:46'!
 balance
 
-	^ financialAccounts sum: [:accounting | accounting balance ] ifEmpty: [0].! !
+	^ financialAccounts sum: [:aFinancialAccount | aFinancialAccount balance ] ifEmpty: [0].! !
 
 
-!Portfolio methodsFor: 'transactions' stamp: 'jn 5/24/2021 14:36:00'!
+!Portfolio methodsFor: 'transactions' stamp: 'jn 5/24/2021 15:58:52'!
 transactions
-	| transactions |
-	transactions := OrderedCollection new.
-	financialAccounts do: [:accounting | transactions addAll: accounting transactions].
-	^transactions copy.! !
+	
+	^ (financialAccounts collect: [ :aFinancialAccount | aFinancialAccount transactions ]) asOrderedCollection flatten copy.
+	
+! !
 
 
 !Portfolio methodsFor: 'duplicated - private' stamp: 'jn 5/23/2021 19:01:30'!
@@ -523,22 +532,25 @@ addParent: aParentPortfolio
 	parents add: aParentPortfolio.
 ! !
 
-!Portfolio methodsFor: 'duplicated - private' stamp: 'jn 5/24/2021 15:16:49'!
+!Portfolio methodsFor: 'duplicated - private' stamp: 'jn 5/24/2021 15:50:02'!
 hasAnyDuplicatedWith: aFinancialAccountToAdd
+
 	parents isEmpty 
 		ifTrue: [ ^ self hasDuplicatesWith: aFinancialAccountToAdd ]
 		ifFalse:[ ^ parents anySatisfy: [ :aPortfolio | aPortfolio hasAnyDuplicatedWith: aFinancialAccountToAdd ]]
 ! !
 
-!Portfolio methodsFor: 'duplicated - private' stamp: 'jn 5/24/2021 15:18:47'!
+!Portfolio methodsFor: 'duplicated - private' stamp: 'jn 5/24/2021 15:49:55'!
 hasDuplicatesWith: aFinancialAccountToAdd
+
 	(aFinancialAccountToAdd relatedWith: self)
 		ifTrue: [ ^ true ]
 		ifFalse:[ ^ financialAccounts anySatisfy: [ :aFinancialAccount | 
 				aFinancialAccount hasDuplicatesWith: aFinancialAccountToAdd ]].! !
 
-!Portfolio methodsFor: 'duplicated - private' stamp: 'jn 5/24/2021 15:21:17'!
+!Portfolio methodsFor: 'duplicated - private' stamp: 'jn 5/24/2021 15:49:26'!
 relatedWith: aFinancialAccount
+
 	(self = aFinancialAccount)
 		ifTrue: [ ^ true ]
 		ifFalse:[ ^ financialAccounts anySatisfy: [ :aFinancialAccountToAdd | 
@@ -564,17 +576,18 @@ addFinancialAccount: aFinancialAccountToAdd
 ! !
 
 
-!Portfolio methodsFor: 'add' stamp: 'jn 5/24/2021 00:47:29'!
-add: anAccounting 
+!Portfolio methodsFor: 'add' stamp: 'jn 5/24/2021 15:49:36'!
+add: aFinancialAccount 
 	
-	anAccounting addToPortfolio: self.
+	aFinancialAccount addToPortfolio: self.
 ! !
 
 
-!Portfolio methodsFor: 'testing' stamp: 'jn 5/23/2021 17:13:23'!
-hasRegistered: aTransaction 
-	
-	^ self transactions includes: aTransaction.! !
+!Portfolio methodsFor: 'testing' stamp: 'jn 5/24/2021 15:33:48'!
+hasRegistered: aTransaction
+
+	^ self transactions includes: aTransaction 
+! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -614,13 +627,13 @@ transactions
 	^ transactions copy! !
 
 
-!ReceptiveAccount methodsFor: 'balance' stamp: 'jn 5/17/2021 21:57:24'!
+!ReceptiveAccount methodsFor: 'balance' stamp: 'jn 5/24/2021 15:58:13'!
 balance
-	| totalBalance |
-	totalBalance := 0.
-	transactions do: [:aTransaction |  totalBalance := aTransaction addToBalance: totalBalance ].
-	
-	^totalBalance.
+
+	^ transactions inject: 0 into: [ :totalBalance :aTransaction | aTransaction addToBalance: totalBalance]
+
+
+
 ! !
 
 
@@ -631,10 +644,11 @@ hasRegistered: aTransaction
 ! !
 
 
-!ReceptiveAccount methodsFor: 'duplicated - private' stamp: 'jn 5/24/2021 15:20:43'!
+!ReceptiveAccount methodsFor: 'duplicated - private' stamp: 'jn 5/24/2021 16:00:19'!
 addParent: aParentPortfolio
 
-	! !
+	" Este mensaje esta para que ReceptiveAccount sea polimorfico con Portfolio y asi evitar ifs a la hora 
+	 de agregar parents a los portfolios. "! !
 
 !ReceptiveAccount methodsFor: 'duplicated - private' stamp: 'jn 5/24/2021 15:19:39'!
 hasDuplicatesWith: aFinancialAccount
