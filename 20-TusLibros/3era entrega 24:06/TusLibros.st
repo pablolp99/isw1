@@ -5,7 +5,7 @@ TestCase subclass: #ApplicationFacadeTest
 	poolDictionaries: ''
 	category: 'TusLibros'!
 
-!ApplicationFacadeTest methodsFor: 'as yet unclassified' stamp: 'plp 6/24/2021 00:02:32'!
+!ApplicationFacadeTest methodsFor: 'tests' stamp: 'plp 6/24/2021 00:02:32'!
 setUp 
 
 	| validYear validMonth |
@@ -37,41 +37,41 @@ setUp
 	
 	now := self now.! !
 
-!ApplicationFacadeTest methodsFor: 'as yet unclassified' stamp: 'plp 6/24/2021 00:26:37'!
-test01CreateCartForNonRegisteredUser
+!ApplicationFacadeTest methodsFor: 'tests' stamp: 'jn 6/24/2021 13:48:44'!
+test01CanNotCreateCartWithInvalidCredentials
 
 	| app |
 	
 	app := self createDefaultCatalogedApp.
 	
-	self assertErrorCreateCartFor: app with: invalidUserID .
-	self assertErrorCreateCartFor: app with: validUserID .! !
+	self assertErrorCreateCartIn: app with: invalidUserID .
+	self assertErrorCreateCartIn: app with: validUserID .! !
 
-!ApplicationFacadeTest methodsFor: 'as yet unclassified' stamp: 'plp 6/24/2021 01:19:30'!
-test02CreateCartForRegisteredUserAndCorrectPassword
+!ApplicationFacadeTest methodsFor: 'tests' stamp: 'jn 6/24/2021 16:18:03'!
+test02CartIsEmptyBeforeCreateCartForValidCredentials
 
 	| app cartId |
 	
 	app := self createDefaultCatalogedApp.
 	
-	cartId := self createCartForValidUserAndCorrectPasswordNowFor: app at: self now.
+	cartId := self createCartForValidCredentialsIn: app createAt: self now.
 	
-	self assert: (#() asOrderedCollection) equals: (app listCartFor: cartId).! !
+	self assert: (app listCartFor: cartId on: self now) isEmpty .! !
 
-!ApplicationFacadeTest methodsFor: 'as yet unclassified' stamp: 'plp 6/24/2021 01:19:30'!
-test03CreateMultipleCartsWithValidUsers
+!ApplicationFacadeTest methodsFor: 'tests' stamp: 'jn 6/24/2021 13:25:58'!
+test03CartsIdNotEqualsWhenCreateMultipleCarts
 
 	| app oneCartId anotherCartId |
 	
 	app := self createDefaultCatalogedApp.
 	
-	oneCartId := self createCartForValidUserAndCorrectPasswordNowFor: app at: self now.
-	anotherCartId := self createCartForValidUserAndCorrectPasswordNowFor: app at: self now.
+	oneCartId := self createCartForValidCredentialsIn: app createAt: self now.
+	anotherCartId := self createCartForValidCredentialsIn: app createAt: self now.
 	
 	self deny: (oneCartId = anotherCartId).! !
 
-!ApplicationFacadeTest methodsFor: 'as yet unclassified' stamp: 'plp 6/24/2021 00:23:19'!
-test04AddToCartToInvalidCartId
+!ApplicationFacadeTest methodsFor: 'tests' stamp: 'jn 6/24/2021 13:26:15'!
+test04CanNotAddToCartToInvalidCartId
 
 	| app |
 	
@@ -83,27 +83,27 @@ test04AddToCartToInvalidCartId
 		withExceptionDo: [ :anError |
 			self assert: anError messageText = ApplicationFacade invalidCartIdErrorDescription ].! !
 
-!ApplicationFacadeTest methodsFor: 'as yet unclassified' stamp: 'plp 6/24/2021 01:19:30'!
-test06AddToCartToValidCartIDAValidISBNWithAValidQuantity
+!ApplicationFacadeTest methodsFor: 'tests' stamp: 'jn 6/24/2021 16:18:12'!
+test05ListCartHasItemAndQuantityAddedToCart
 
 	| app cartId expectedList |
 	
 	app := self createDefaultCatalogedApp.
-	cartId := self createCartForValidUserAndCorrectPasswordNowFor: app at: self now.
-	self addValidItemToCart: cartId in: app amount: 1.
+	cartId := self createCartForValidCredentialsIn: app createAt: self now.
+	self add: 1 ofValidItemToCart: cartId in: app.
 	
 	expectedList := OrderedCollection new.
 	expectedList add: (1@validIsbn).
 	
-	self assert: (app listCartFor: cartId) equals: expectedList.! !
+	self assert: (app listCartFor: cartId on: self now) equals: expectedList.! !
 
-!ApplicationFacadeTest methodsFor: 'as yet unclassified' stamp: 'plp 6/24/2021 01:22:05'!
-test09CheckOutCartValidCardAndCart
+!ApplicationFacadeTest methodsFor: 'tests' stamp: 'jn 6/24/2021 13:44:03'!
+test06SalesBookHasRegisteredCheckOut
 
 	| app sale salesBook transactionId |
 	
 	app := self createDefaultCatalogedApp.
-	transactionId := (self createTransactionForNewCartWith: 1 on: app createAt: self now checkOutAt: self now) .
+	transactionId := (self checkoutCartWith: 1 ofItemin: app createAt: self now checkOutAt: self now) .
 		
 	sale := (Sale of: StoreTestObjectsFactory new itemSellByTheStorePrice).
 	salesBook := app salesBook.
@@ -112,29 +112,28 @@ test09CheckOutCartValidCardAndCart
 	self assert: (salesBook first total) equals: sale total.
 ! !
 
-!ApplicationFacadeTest methodsFor: 'as yet unclassified' stamp: 'plp 6/24/2021 01:22:05'!
-test10CheckOutMultipleCartsWithValidCard
+!ApplicationFacadeTest methodsFor: 'tests' stamp: 'jn 6/24/2021 13:47:29'!
+test07TransactionsIdsNotEqualesWhenCheckOutMultipleCarts
 
 	| app |
 	
 	app := self createDefaultCatalogedApp.
 			
-	self deny: 
-		(self createTransactionForNewCartWith: 1 on: app createAt: self now checkOutAt: self now ) = (self createTransactionForNewCartWith: 2 on: app createAt: self now checkOutAt: self now )
+	self deny: (self checkoutCartWith: 1 ofItemin: app) = (self checkoutCartWith: 2 ofItemin: app)
 ! !
 
-!ApplicationFacadeTest methodsFor: 'as yet unclassified' stamp: 'plp 6/24/2021 00:43:42'!
-test11ListPurchasesOfNonExistingUserOrWrongPassword
+!ApplicationFacadeTest methodsFor: 'tests' stamp: 'jn 6/24/2021 13:49:02'!
+test08CanNotListPurchasesWithInvalidCredentials
 
 	| app |
 	
 	app := self createDefaultCatalogedApp.
 	
-	self assertErrorListPurchaseOf: app with: invalidUserID password: correctPassword.
-	self assertErrorListPurchaseOf: app with: validUserID password: wrongPassword .! !
+	self assertErrorListPurchaseIn: app withUser: invalidUserID andPassword: correctPassword.
+	self assertErrorListPurchaseIn: app withUser: validUserID andPassword: wrongPassword .! !
 
-!ApplicationFacadeTest methodsFor: 'as yet unclassified' stamp: 'plp 6/24/2021 00:23:48'!
-test12ListPurchasesOfRegisteredUserWithoutPurchases
+!ApplicationFacadeTest methodsFor: 'tests' stamp: 'jn 6/24/2021 16:07:03'!
+test09EmptyListPurchasesOfValidUserWithoutPurchases
 
 	| app purchases |
 	
@@ -142,75 +141,75 @@ test12ListPurchasesOfRegisteredUserWithoutPurchases
 	
 	purchases := app listPurchasesFor: validUserID withPassword: correctPassword .
 	
-	self assert: purchases equals: 0@OrderedCollection new.! !
+	self assert: purchases equals: 0@Dictionary new.! !
 
-!ApplicationFacadeTest methodsFor: 'as yet unclassified' stamp: 'plp 6/24/2021 01:22:05'!
-test13ListPurchasesOfRegisteredUserWithOnePurchase
+!ApplicationFacadeTest methodsFor: 'tests' stamp: 'jn 6/24/2021 16:07:25'!
+test10ListPurchasesKnowsItemsQuantityAndTotalOfUserUniquePurchase
 
-	| app purchases result |
+	| app purchases expectedDictPurchases |
 	
 	app := self createDefaultCatalogedApp.
-	self createTransactionForNewCartWith: 1 on: app createAt: self now checkOutAt: self now.
+	self checkoutCartWith: 1 ofItemin: app .
 	
 	purchases := app listPurchasesFor: validUserID withPassword: correctPassword .
 	
-	result := 10@(OrderedCollection new).
-	(result y) add: 1@validIsbn .
+	expectedDictPurchases := self listPurchasesWith: 1 of: validIsbn total: 10.
 	
-	self assert: purchases equals: result.! !
+	self assert: purchases equals: expectedDictPurchases.! !
 
-!ApplicationFacadeTest methodsFor: 'as yet unclassified' stamp: 'plp 6/24/2021 01:22:05'!
-test14ListPurchasesOfRegisteredUserWithMultiplePurchases
+!ApplicationFacadeTest methodsFor: 'tests' stamp: 'jn 6/24/2021 14:06:54'!
+test11ListPurchasesKnowsItemsQuantityAndTotalOfUserMultiplePurchases
 
-	| app purchases result |
+	| app purchases expectedListPurchases |
 	
 	app := self createDefaultCatalogedApp.
 	
-	self createTransactionForNewCartWith: 1 on: app createAt: self now checkOutAt: self now .
-	self createTransactionForNewCartWith: 2 on: app createAt: self now checkOutAt: self now .
+	self checkoutCartWith: 1 ofItemin: app .
+	self checkoutCartWith: 2 ofItemin: app .
 	
 	purchases := app listPurchasesFor: validUserID withPassword: correctPassword .
-	
-	result := 30@(OrderedCollection new).
-	(result y) add: 3@validIsbn .
-	
-	self assert: purchases equals: result.! !
 
-!ApplicationFacadeTest methodsFor: 'as yet unclassified' stamp: 'plp 6/24/2021 01:22:05'!
+	expectedListPurchases := self listPurchasesWith: 3 of: validIsbn total: 30.
+
+	self assert: purchases equals: expectedListPurchases.! !
+
+!ApplicationFacadeTest methodsFor: 'tests' stamp: 'jn 6/24/2021 16:28:10'!
 test15ListPurchasesOfMultipleUsers
 
-	| app anotherValidUser anotherCartId purchasesAnotherUser purchasesFirstUser resultAnotherUser resultFirstUser |
+	| app anotherValidUser anotherCartId purchasesAnotherUser purchasesFirstUser expectedListPurchasesAnotherUser expectedListPurchasesFirstUser |
 	
 	app := self createDefaultCatalogedApp.
 	
+	
+	self checkoutCartWith: 1 ofItemin: app  .
+	
 	anotherValidUser := '54321' .
-	
-	self createTransactionForNewCartWith: 1 on: app createAt: self now checkOutAt: self now .
-	
 	anotherCartId := app createCartForUser: anotherValidUser password: correctPassword on: self now.
-	self addValidItemToCart: anotherCartId in: app amount: 2.
-	app checkOutCart: anotherCartId withCardNumber: validCardNumber owner: validCardOwner expiresOn: validExpirationDate trought: merchantProcessorSuccess on: self now .
+	self add: 2 ofValidItemToCart: anotherCartId in: app.
+	app checkOutCart: anotherCartId 
+		withCardNumber: validCardNumber 
+		owner: validCardOwner 
+		expiresOn: validExpirationDate 
+		trought: merchantProcessorSuccess 
+		on: self now .
 	
 	purchasesFirstUser := app listPurchasesFor: validUserID withPassword: correctPassword .
 	purchasesAnotherUser := app listPurchasesFor: anotherValidUser withPassword: correctPassword .
 	
-	resultFirstUser := 10@(OrderedCollection new).
-	(resultFirstUser y) add: 1@validIsbn .
+	expectedListPurchasesFirstUser := self listPurchasesWith: 1 of: validIsbn total: 10.
+	expectedListPurchasesAnotherUser := self listPurchasesWith: 2 of: validIsbn total: 20.
 	
-	resultAnotherUser := 20@(OrderedCollection new).
-	(resultAnotherUser y) add: 2@validIsbn .
-	
-	self assert: purchasesFirstUser equals: resultFirstUser.
-	self assert: purchasesAnotherUser equals: resultAnotherUser.! !
+	self assert: purchasesFirstUser equals: expectedListPurchasesFirstUser.
+	self assert: purchasesAnotherUser equals: expectedListPurchasesAnotherUser.! !
 
-!ApplicationFacadeTest methodsFor: 'as yet unclassified' stamp: 'plp 6/24/2021 01:19:30'!
-test16AddToCartFailsAfter30Minutes
+!ApplicationFacadeTest methodsFor: 'tests' stamp: 'jn 6/24/2021 16:48:03'!
+test16AddToCartFailsAfter30MinutesOfInactivity
 
 	| app cartId |
 	
 	app := self createDefaultCatalogedApp.
 	
-	cartId := self createCartForValidUserAndCorrectPasswordNowFor: app at: self now.
+	cartId := self createCartForValidCredentialsIn: app createAt: self now.
 	
 	self 
 		should: [ app addToCart: cartId with: validIsbn quantity: 1 on: (self now + 30 minutes). ]
@@ -218,8 +217,8 @@ test16AddToCartFailsAfter30Minutes
 		withExceptionDo: [ :anError |
 			self assert: anError messageText = ApplicationFacade cartOutOfTimeErrorDescription ]! !
 
-!ApplicationFacadeTest methodsFor: 'as yet unclassified' stamp: 'plp 6/24/2021 01:23:08'!
-test17CheckOutCartFailsAfter30Minutes
+!ApplicationFacadeTest methodsFor: 'tests' stamp: 'jn 6/24/2021 17:04:57'!
+test17CheckOutCartFailsAfter30MinutesOfInactivity
 
 	| app now |
 	
@@ -227,19 +226,75 @@ test17CheckOutCartFailsAfter30Minutes
 	now := self now.
 	
 	self 
-		should: [ self createTransactionForNewCartWith: 1 on: app createAt: now checkOutAt: (now + 30 minutes). ]
+		should: [ self checkoutCartWith: 1 ofItemin: app createAt: now checkOutAt: (now + 31 minutes). ]
 		raise: Error
 		withExceptionDo: [ :anError |
 			self assert: anError messageText = ApplicationFacade cartOutOfTimeErrorDescription ]! !
 
+!ApplicationFacadeTest methodsFor: 'tests' stamp: 'jn 6/24/2021 16:48:18'!
+test18ListCartFailsAfter30MinutesOfInactivity
 
-!ApplicationFacadeTest methodsFor: 'private' stamp: 'plp 6/24/2021 00:35:09'!
-addValidItemToCart: aCartID in: anApp amount: anAmount 
+	| app now cartId |
 	
-	anApp addToCart: aCartID with: validIsbn quantity: anAmount on: self now.! !
+	app := self createDefaultCatalogedApp.
+	cartId := self createCartForValidCredentialsIn: app createAt: self now.
+	self add: 1 ofValidItemToCart: cartId in: app.
+	now := self now.
 
-!ApplicationFacadeTest methodsFor: 'private' stamp: 'plp 6/24/2021 00:25:37'!
-assertErrorCreateCartFor: anApp with: anUserID
+	self 
+		should: [ app listCartFor: cartId on: (now + 30 minutes). ]
+		raise: Error
+		withExceptionDo: [ :anError |
+			self assert: anError messageText = ApplicationFacade cartOutOfTimeErrorDescription ]! !
+
+!ApplicationFacadeTest methodsFor: 'tests' stamp: 'jn 6/24/2021 16:33:06'!
+test19CanNotCheckoutTwiceSameCart
+
+	| app cartId |
+	
+	app := self createDefaultCatalogedApp.
+	
+	cartId := self createCartForValidCredentialsIn: app createAt: self now.
+	self add: 1 ofValidItemToCart: cartId in: app.
+	app checkOutCart: cartId 
+			withCardNumber: validCardNumber 
+			owner: validCardOwner 
+			expiresOn: validExpirationDate 
+			trought: merchantProcessorSuccess on: self now .
+	
+	self 
+		should: [ app checkOutCart: cartId 
+			withCardNumber: validCardNumber 
+			owner: validCardOwner 
+			expiresOn: validExpirationDate 
+			trought: merchantProcessorSuccess on: self now .]
+		raise: Error
+		withExceptionDo: [ :anError |
+			self assert: anError messageText = ApplicationFacade canNotCheckoutTwiceSameCartErrorDescription ]! !
+
+!ApplicationFacadeTest methodsFor: 'tests' stamp: 'jn 6/24/2021 16:57:25'!
+test20EventFailsAfter30MinutesOfInactivity
+
+	| app now cartId expectedList |
+	now := self now.
+	app := self createDefaultCatalogedApp.
+	cartId := self createCartForValidCredentialsIn: app createAt: now.
+	app addToCart: cartId with: validIsbn quantity: 2 on: (now + 15 minutes).
+	
+	expectedList := OrderedCollection new.
+	expectedList add: (2@validIsbn).
+	
+	self assert: (app listCartFor: cartId on: (self now + 30 minutes)) equals: expectedList.
+		! !
+
+
+!ApplicationFacadeTest methodsFor: 'private' stamp: 'jn 6/24/2021 13:13:00'!
+add: aQuantity ofValidItemToCart: aCartID in: anApp  
+	
+	anApp addToCart: aCartID with: validIsbn quantity: aQuantity on: self now.! !
+
+!ApplicationFacadeTest methodsFor: 'private' stamp: 'jn 6/24/2021 13:06:35'!
+assertErrorCreateCartIn: anApp with: anUserID
 	
 	self 
 		should: [ anApp createCartForUser: anUserID password: wrongPassword on: self now ]
@@ -247,18 +302,37 @@ assertErrorCreateCartFor: anApp with: anUserID
 		withExceptionDo: [ :anError |
 			self assert: anError messageText = ApplicationFacade authenticationFailedErrorDescription ].! !
 
-!ApplicationFacadeTest methodsFor: 'private' stamp: 'plp 6/24/2021 00:43:08'!
-assertErrorListPurchaseOf: anApp with: aUserId password: aPassword
+!ApplicationFacadeTest methodsFor: 'private' stamp: 'jn 6/24/2021 13:13:45'!
+assertErrorListPurchaseIn: anApp withUser: aUserId andPassword: aPassword
+
 	self 
 		should: [ anApp listPurchasesFor: aUserId withPassword: aPassword ]
 		raise: Error
 		withExceptionDo: [ :anError |
 			self assert: anError messageText = ApplicationFacade authenticationFailedErrorDescription ].! !
 
-!ApplicationFacadeTest methodsFor: 'private' stamp: 'plp 6/24/2021 01:19:40'!
-createCartForValidUserAndCorrectPasswordNowFor: anApp at: aTime
+!ApplicationFacadeTest methodsFor: 'private' stamp: 'jn 6/24/2021 13:45:43'!
+checkoutCartWith: aQuantity ofItemin: anApp 
 
-	^ anApp createCartForUser: validUserID password: correctPassword on: aTime.
+  	^ self checkoutCartWith: aQuantity ofItemin: anApp createAt: self now checkOutAt: self now 
+! !
+
+!ApplicationFacadeTest methodsFor: 'private' stamp: 'jn 6/24/2021 13:44:03'!
+checkoutCartWith: aQuantity ofItemin: anApp createAt: aCreationTime checkOutAt: aCheckOutTime
+	
+	| cartId |
+	cartId := self createCartForValidCredentialsIn: anApp createAt: aCreationTime.
+	self add: aQuantity ofValidItemToCart: cartId in: anApp.
+	^ anApp checkOutCart: cartId 
+			withCardNumber: validCardNumber 
+			owner: validCardOwner 
+			expiresOn: validExpirationDate 
+			trought: merchantProcessorSuccess on: aCheckOutTime .! !
+
+!ApplicationFacadeTest methodsFor: 'private' stamp: 'jn 6/24/2021 13:14:53'!
+createCartForValidCredentialsIn: anApp createAt: aCreationTime
+
+	^ anApp createCartForUser: validUserID password: correctPassword on: aCreationTime.
 	! !
 
 !ApplicationFacadeTest methodsFor: 'private' stamp: 'plp 6/24/2021 00:22:34'!
@@ -267,17 +341,13 @@ createDefaultCatalogedApp
 	^ApplicationFacade forCatalog: defaultCatalog.
 ! !
 
-!ApplicationFacadeTest methodsFor: 'private' stamp: 'plp 6/24/2021 01:22:37'!
-createTransactionForNewCartWith: anAmount on: anApp createAt: aCreationTime checkOutAt: aCheckOutTime
-	
-	| cartId |
-	cartId := self createCartForValidUserAndCorrectPasswordNowFor: anApp at: aCreationTime.
-	self addValidItemToCart: cartId in: anApp amount: anAmount.
-	^ anApp checkOutCart: cartId 
-			withCardNumber: validCardNumber 
-			owner: validCardOwner 
-			expiresOn: validExpirationDate 
-			trought: merchantProcessorSuccess on: aCheckOutTime .! !
+!ApplicationFacadeTest methodsFor: 'private' stamp: 'jn 6/24/2021 16:08:07'!
+listPurchasesWith: aQuantity of: anIsbn total: total 
+
+	| itemsPurchased |
+	itemsPurchased := Dictionary new.
+	itemsPurchased add: (anIsbn->aQuantity).
+	^ total@itemsPurchased.! !
 
 !ApplicationFacadeTest methodsFor: 'private' stamp: 'plp 6/24/2021 00:00:50'!
 now
@@ -596,12 +666,12 @@ test04CanNotCreateACardWithExceededLengthOwner
 
 !classDefinition: #ApplicationFacade category: 'TusLibros'!
 Object subclass: #ApplicationFacade
-	instanceVariableNames: 'lastCartId catalog carts salesBook lastTransactionId cartOwners purchases'
+	instanceVariableNames: 'lastCartId catalog carts salesBook lastTransactionId purchases cartsForUsers'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'TusLibros'!
 
-!ApplicationFacade methodsFor: 'initialization' stamp: 'plp 6/23/2021 22:58:38'!
+!ApplicationFacade methodsFor: 'initialization' stamp: 'jn 6/24/2021 16:06:39'!
 initializeWith: aCatalog
 	
 	lastCartId := 0 .
@@ -609,7 +679,7 @@ initializeWith: aCatalog
 	carts := Dictionary new .
 	salesBook := OrderedCollection new .
 	lastTransactionId := 0 .
-	cartOwners := Dictionary new .
+	cartsForUsers := Dictionary new .
 	purchases := Dictionary new . ! !
 
 !ApplicationFacade methodsFor: 'initialization' stamp: 'plp 6/23/2021 21:53:19'!
@@ -618,27 +688,22 @@ today
 	^ GregorianMonthOfYear current.! !
 
 
-!ApplicationFacade methodsFor: 'communication' stamp: 'plp 6/24/2021 00:58:44'!
+!ApplicationFacade methodsFor: 'communication' stamp: 'jn 6/24/2021 16:46:29'!
 addToCart: aCartId with: anISBN quantity: aQuantity on: on 
 
 	|cart|
-	
-	cart := (carts at: aCartId ifAbsent: [ 	self error: ApplicationFacade invalidCartIdErrorDescription ]) key.
-	
-	self assertCartLastActivity: aCartId on: on .
-	
+	cart := self getCart: aCartId ifValidOn: on.
 	cart add: aQuantity of: anISBN.
 	! !
 
-!ApplicationFacade methodsFor: 'communication' stamp: 'plp 6/24/2021 01:15:11'!
+!ApplicationFacade methodsFor: 'communication' stamp: 'jn 6/24/2021 16:44:03'!
 checkOutCart: aCartId withCardNumber: aCardNumber owner: aCardOwner expiresOn: aCardExpirationString trought: aProcessor on: on  
 
-	| card cart cashier |
-
-	self assertCartLastActivity: aCartId on: on .
+	| card cart cashier total |
+	self assertCartNotCheckouted: aCartId.
+	cart := self getCart: aCartId ifValidOn: on.
 		
 	card := self createCardWith: aCardNumber owner: aCardOwner expiresOn: aCardExpirationString .
-	cart := 	(carts at: aCartId) key .
 
 	cashier := Cashier 
 				toCheckout: cart
@@ -647,96 +712,72 @@ checkOutCart: aCartId withCardNumber: aCardNumber owner: aCardOwner expiresOn: a
 				on: self today
 				registeringOn: salesBook .
 				
-	cashier checkOut .
+	total := cashier checkOut .
 	
-	"Agregar a purchases"
-	self addPurchase: aCartId .
+	self add: aCartId ToPurchasesWithTotal: total. 
 	
-	lastTransactionId := lastTransactionId + 1 .
-	^ lastTransactionId! !
+	^ self getTransactionId.! !
 
-!ApplicationFacade methodsFor: 'communication' stamp: 'plp 6/24/2021 00:47:45'!
+!ApplicationFacade methodsFor: 'communication' stamp: 'jn 6/24/2021 16:45:08'!
 createCartForUser: aUserId password: aPassword on: aTimeStamp
 
 	| newCartId newCart |
 
 	self assertAuthentication: aUserId with: aPassword.
 	
-	lastCartId := lastCartId + 1.
-	newCartId := lastCartId .	
+	newCartId := self getCartId .	
 	newCart := Cart acceptingItemsOf: catalog.
 	
-	carts add: newCartId->(newCart->aTimeStamp) . "  timeStamp@newCart "
-	cartOwners add: newCartId->aUserId .
+	carts add: newCartId->(newCart->aTimeStamp) .
+	self addCart: newCartId forUser: aUserId.
 	
 	^ newCartId ! !
 
-!ApplicationFacade methodsFor: 'communication' stamp: 'plp 6/24/2021 00:49:11'!
-listCartFor: aCartId
+!ApplicationFacade methodsFor: 'communication' stamp: 'jn 6/24/2021 16:17:40'!
+listCartFor: aCartId on: aDateTime 
 
-	| cart list |
+	| cart listItems |
 	
-	cart := (carts at: aCartId ifAbsent: [ 	self error: ApplicationFacade invalidCartIdErrorDescription ]) key.
-	list := OrderedCollection new.
+	cart := self getCart: aCartId ifValidOn: aDateTime.
+	listItems := OrderedCollection new.
 	
-	
-	catalog keysDo: [ 
-		:item | 
-			(cart occurrencesOf: item) = 0 ifFalse: [
-				list add: ( (cart occurrencesOf: item) @ item ).
-		].
-	].
+	catalog keysDo: [ :item | |itemQuantity| 
+		itemQuantity := (cart occurrencesOf: item).
+		itemQuantity = 0 ifFalse: [ listItems add: ( itemQuantity @ item ) ] ].
 
-	^ list! !
+	^ listItems! !
 
-!ApplicationFacade methodsFor: 'communication' stamp: 'plp 6/23/2021 23:40:41'!
+!ApplicationFacade methodsFor: 'communication' stamp: 'jn 6/24/2021 16:05:24'!
 listPurchasesFor: aUserId withPassword: aPassword
 	
-	| total collection |
+	| total items userCartsIds |
 	self assertAuthentication: aUserId with: aPassword .
-	collection := 	OrderedCollection new .
+	items := 	Dictionary new .
 	total := 0 .
 	
-	(purchases at: aUserId ifAbsent: [ ^ total@collection ]) keysAndValuesDo: [ :key :value |
-		collection add: (value@key) .
-		total := total + (self getTotal: key quantity: value) .
-	] .
+	userCartsIds := cartsForUsers at: aUserId ifAbsent: [ OrderedCollection new ].
+	userCartsIds do: [ :aCartId |  
+		(purchases includesKey: aCartId) ifTrue: [
+			total := total + purchases at: aCartId. 
+			self summarizeItemsFrom: aCartId to: items.
+		].		
+	].
 	
-	^ total@collection.! !
+	^ total@items.! !
 
 
-!ApplicationFacade methodsFor: 'private' stamp: 'plp 6/23/2021 23:27:32'!
-addPurchase: aCartId
-	
-	| userId purchasesDict cartItems |
-	
-	userId := cartOwners at: aCartId .
-	
-	purchasesDict := purchases at: userId ifAbsent: [ 
-		purchases add: userId->Dictionary new .
-		purchases at: userId .
-	] .
-	
-	cartItems := self listCartFor: aCartId .
-	
-	cartItems do: [ :item |
-		purchasesDict at: (item y) ifAbsent: [			purchasesDict add: (item y)->0 ] .
-		purchasesDict at: (item y) put: ( (purchasesDict at: (item y)) + (item x))
-	]
-	
-	"purchasesCollection add: aCartId ."! !
+!ApplicationFacade methodsFor: 'private' stamp: 'jn 6/24/2021 15:46:04'!
+add: aCartId ToPurchasesWithTotal: total
 
-!ApplicationFacade methodsFor: 'private' stamp: 'plp 6/22/2021 18:34:47'!
-assertAuthentication: aUserId with: aPassword
+	purchases add: aCartId->total .! !
 
-	AuthSimulator authenticateUserId: aUserId withPassword: aPassword.! !
+!ApplicationFacade methodsFor: 'private' stamp: 'jn 6/24/2021 16:06:25'!
+addCart: aCartId forUser: aUserId
 
-!ApplicationFacade methodsFor: 'private' stamp: 'plp 6/23/2021 22:10:18'!
-createAvailableId
-
-	lastCartId := lastCartId + 1.
-	^ lastCartId
-	! !
+	cartsForUsers at: aUserId ifAbsent: [ 
+		cartsForUsers add: aUserId->OrderedCollection new ].
+	(cartsForUsers at: aUserId) add: aCartId.
+! !
 
 !ApplicationFacade methodsFor: 'private' stamp: 'plp 6/23/2021 21:07:55'!
 createCardWith: aCardNumber owner: aCardOwner expiresOn: aCardExpirationString
@@ -750,24 +791,87 @@ createCardWith: aCardNumber owner: aCardOwner expiresOn: aCardExpirationString
 	
 	^ CreditCard withNumber: aCardNumber owner: aCardOwner expiresOn: expiration ! !
 
-!ApplicationFacade methodsFor: 'private' stamp: 'plp 6/23/2021 23:36:18'!
-getTotal: anISBN quantity: aQuantity
+!ApplicationFacade methodsFor: 'private' stamp: 'jn 6/24/2021 16:22:50'!
+getCart: aCartId
 	
-	^ (catalog at: anISBN) * aQuantity ! !
+	^ (carts at: aCartId ifAbsent: [ 	self error: ApplicationFacade invalidCartIdErrorDescription ]) key.
+	! !
 
-!ApplicationFacade methodsFor: 'private' stamp: 'plp 6/23/2021 22:08:37'!
+!ApplicationFacade methodsFor: 'private' stamp: 'jn 6/24/2021 17:03:24'!
+getCart: aCartId ifValidOn: on
+
+	| cartAndCreation cart |
+	
+	cartAndCreation := carts at: aCartId ifAbsent: [ 	self error: ApplicationFacade invalidCartIdErrorDescription ].
+	self assertCartLastActivity: (cartAndCreation value) on: on .
+	cart := cartAndCreation key.
+	carts add: (aCartId -> (cart -> on)).
+	^  cart.
+	! !
+
+!ApplicationFacade methodsFor: 'private' stamp: 'jn 6/24/2021 16:45:41'!
+getCartId
+
+	lastCartId := lastCartId + 1.
+	^ lastCartId! !
+
+!ApplicationFacade methodsFor: 'private' stamp: 'jn 6/24/2021 16:45:49'!
+getTransactionId
+
+	lastTransactionId := lastTransactionId + 1.
+	^ lastTransactionId! !
+
+!ApplicationFacade methodsFor: 'private' stamp: 'jn 6/24/2021 16:21:56'!
+listCartFor: aCartId
+
+	| cart listItems |
+	
+	cart := self getCart: aCartId.
+	listItems := OrderedCollection new.
+	
+	catalog keysDo: [ :item | |itemQuantity| 
+		itemQuantity := (cart occurrencesOf: item).
+		itemQuantity = 0 ifFalse: [ listItems add: ( itemQuantity @ item ) ] ].
+
+	^ listItems! !
+
+!ApplicationFacade methodsFor: 'private' stamp: 'jn 6/24/2021 14:59:24'!
+now
+
+	^ DateAndTime now ! !
+
+!ApplicationFacade methodsFor: 'private' stamp: 'jn 6/24/2021 16:19:44'!
+summarizeItemsFrom: aCartId to: items
+
+	(self listCartFor: aCartId) do: [ :item | | isbn quantity |
+		isbn := item y. quantity := item x.
+		items at: isbn ifAbsent: [			items add: isbn->0 ] .
+		items at: isbn put: ( (items at: isbn) + quantity)]! !
+
+
+!ApplicationFacade methodsFor: 'testing' stamp: 'plp 6/23/2021 22:08:37'!
 salesBook
 	
 	^ salesBook! !
 
 
-!ApplicationFacade methodsFor: 'assertions' stamp: 'plp 6/24/2021 01:15:46'!
-assertCartLastActivity: aCartId on: on
+!ApplicationFacade methodsFor: 'assertions' stamp: 'plp 6/22/2021 18:34:47'!
+assertAuthentication: aUserId with: aPassword
+
+	AuthSimulator authenticateUserId: aUserId withPassword: aPassword.! !
+
+!ApplicationFacade methodsFor: 'assertions' stamp: 'jn 6/24/2021 16:59:27'!
+assertCartLastActivity: aCreationDateTime on: on
 	
-	| timeStamp difference |
-	timeStamp := (carts at: aCartId) value.
-	difference := (on - timeStamp) minutes.
-	(difference >= 30) ifTrue: [ self error: ApplicationFacade cartOutOfTimeErrorDescription ].
+	| difference |
+	difference := (on - aCreationDateTime) minutes.
+	(difference >= 30) ifTrue: [ self error: ApplicationFacade cartOutOfTimeErrorDescription ].! !
+
+!ApplicationFacade methodsFor: 'assertions' stamp: 'jn 6/24/2021 16:35:28'!
+assertCartNotCheckouted: aCartId
+
+	(purchases includesKey: aCartId) ifTrue: [ 
+		self error: ApplicationFacade canNotCheckoutTwiceSameCartErrorDescription ].
 	! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
@@ -780,6 +884,11 @@ ApplicationFacade class
 authenticationFailedErrorDescription
 	
 	^ 'Wrong User or Password'! !
+
+!ApplicationFacade class methodsFor: 'as yet unclassified' stamp: 'jn 6/24/2021 16:33:32'!
+canNotCheckoutTwiceSameCartErrorDescription
+	
+	^ 'Can not checkout cart twice.'! !
 
 !ApplicationFacade class methodsFor: 'as yet unclassified' stamp: 'plp 6/24/2021 00:07:01'!
 cartOutOfTimeErrorDescription
